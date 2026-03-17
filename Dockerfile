@@ -2,7 +2,7 @@
 FROM eclipse-temurin:17-jdk-focal AS build
 WORKDIR /app
 COPY . .
-RUN ./mvnw -DskipTests package
+RUN mvn clean package -DskipTests
 
 # Etapa de ejecución
 FROM eclipse-temurin:17-jre-focal
