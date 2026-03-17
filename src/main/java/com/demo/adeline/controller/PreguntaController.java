@@ -11,7 +11,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/preguntas")
 //@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*")
 public class PreguntaController {
 
     private final PreguntaRepository repo;
