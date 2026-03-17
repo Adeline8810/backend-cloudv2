@@ -1,13 +1,11 @@
-# Etapa de construcción
-FROM eclipse-temurin:17-jdk-focal AS build
+# Fase 1: Compilar usando una imagen que SÍ tiene Maven
+FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Etapa de ejecución
-FROM eclipse-temurin:17-jre-focal
+# Fase 2: Ejecutar usando una imagen ligera de Java
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8082
-ENV JAVA_OPTS=""
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
