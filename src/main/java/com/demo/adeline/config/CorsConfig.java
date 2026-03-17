@@ -10,17 +10,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig {
 
 	@Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        // Aquí ponemos tu URL de GitHub y la de localhost por si acaso
-                        .allowedOrigins("https://adeline8810.github.io", "http://localhost:4200")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
+	public WebMvcConfigurer corsConfigurer() {
+	    return new WebMvcConfigurer() {
+	        @Override
+	        public void addCorsMappings(CorsRegistry registry) {
+	            registry.addMapping("/**") // Cambiamos /api/** por /** para cubrir todo
+	                    .allowedOrigins("*") // Usamos el comodín para probar
+	                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	                    .allowedHeaders("*")
+	                    .exposedHeaders("*"); // Ayuda a que el navegador vea las respuestas
+	        }
+	    };
+	}
 }
