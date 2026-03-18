@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.demo.adeline.model.Respuesta;
 import com.demo.adeline.repository.RespuestaRepository;
-
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/respuestas")
@@ -100,44 +98,39 @@ public class RespuestaController {
     
     @CrossOrigin(origins = "*")
     @PostMapping("/api/respuestas/traducir")
-    public Mono<ResponseEntity<Map<String, String>>> traducir(@RequestBody Map<String, String> bodyRequest) {
-
-        // 🤖 Tomamos el texto y el idioma destino del JSON
+    public ResponseEntity<Map<String, String>> traducir(@RequestBody Map<String, String> bodyRequest) {
         String texto = bodyRequest.get("texto");
         String target = bodyRequest.get("target");
 
+        // 📍 Usamos un servidor "Mirror" de LibreTranslate que es 100% gratuito
+        String url = "https://translate.argosopentech.com/translate";
+        
+        RestTemplate restTemplate = new RestTemplate();
         Map<String, String> resultado = new HashMap<>();
 
-        // 📍 API pública y vigente de traducciones
-        WebClient client = WebClient.builder()
-                .baseUrl("https://libretranslate.com")
-                .defaultHeader("Content-Type", "application/json")
-                .build();
-
-        // 🧾 Construimos el body para LibreTranslate
+        // Construimos el cuerpo exactamente como lo pide el servidor gratuito
         Map<String, String> libreBody = new HashMap<>();
         libreBody.put("q", texto);
-        libreBody.put("source", "auto");
+        libreBody.put("source", "es"); // Origen español
         libreBody.put("target", target);
         libreBody.put("format", "text");
+        libreBody.put("api_key", "");
 
-        return client.post()
-                .uri("/translate")
-                .bodyValue(libreBody)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .map(response -> {
-                    if (response != null && response.get("translatedText") != null) {
-                        resultado.put("traducido", response.get("translatedText").toString());
-                    } else {
-                        resultado.put("traducido", "ERROR: respuesta vacía de la API");
-                    }
-                    return ResponseEntity.ok(resultado);
-                })
-                .onErrorResume(e -> {
-                    resultado.put("traducido", "ERROR: servicio de traducción no disponible");
-                    return Mono.just(ResponseEntity.ok(resultado));
-                });
+        try {
+            // Hacemos la petición POST
+            Map<String, Object> response = restTemplate.postForObject(url, libreBody, Map.class);
+            
+            if (response != null && response.containsKey("translatedText")) {
+                resultado.put("traducido", response.get("translatedText").toString());
+            } else {
+                resultado.put("traducido", texto); // Si falla, devuelve el original
+            }
+        } catch (Exception e) {
+            System.out.println("Error llamando al API: " + e.getMessage());
+            resultado.put("traducido", texto);
+        }
+
+        return ResponseEntity.ok(resultado);
     }
     
 }
