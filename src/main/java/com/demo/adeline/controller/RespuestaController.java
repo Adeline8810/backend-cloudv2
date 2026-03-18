@@ -106,16 +106,17 @@ public class RespuestaController {
         
         // 1. Creamos las cabeceras (Headers) indicando que enviamos un formulario
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 2. Usamos MultiValueMap para que RestTemplate lo envíe correctamente
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("q", texto);
-        map.add("source", "es");
-        map.add("target", target);
-        map.add("format", "text");
+        Map<String, String> body = new HashMap<>();
+        body.put("q", texto);
+        body.put("source", "auto");
+        body.put("target", target);
+        body.put("format", "text");
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+      
 
         try {
             // 3. Hacemos la petición POST
