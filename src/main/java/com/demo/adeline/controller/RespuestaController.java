@@ -99,34 +99,26 @@ public class RespuestaController {
         String texto = bodyRequest.get("texto");
         String target = bodyRequest.get("target");
 
-        // URL espejo gratuita que NO pide API Key ni falla como LibreTranslate.com
-        String url = "https://libretranslate.de/translate";
+        // 🚀 Usamos el motor de Google (vía script gratuito)
+        String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=" + target + "&dt=t&q=" + texto;
         
         RestTemplate restTemplate = new RestTemplate();
         Map<String, String> resultado = new HashMap<>();
 
-        // Datos para el traductor
-        Map<String, String> libreBody = new HashMap<>();
-        libreBody.put("q", texto);
-        libreBody.put("source", "es");
-        libreBody.put("target", target);
-        libreBody.put("format", "text");
-        libreBody.put("api_key", "");
-
         try {
-            // Hacemos la petición al servidor de traducción
-            Map<String, Object> response = restTemplate.postForObject(url, libreBody, Map.class);
+            // Google devuelve un Array extraño, así que lo recibimos como Object
+            Object[] response = restTemplate.getForObject(url, Object[].class);
             
-            if (response != null && response.containsKey("translatedText")) {
-                resultado.put("traducido", response.get("translatedText").toString());
+            // Extraemos la traducción del formato de Google
+            if (response != null) {
+                String traducido = ((List)((List)response[0]).get(0)).get(0).toString();
+                resultado.put("traducido", traducido);
             } else {
-                resultado.put("traducido", texto); 
+                resultado.put("traducido", texto);
             }
         } catch (Exception e) {
-            // Si el servidor de traducción falla, devolvemos el texto original para no dar error 500
             resultado.put("traducido", texto);
         }
-
         return ResponseEntity.ok(resultado);
     }
 }
