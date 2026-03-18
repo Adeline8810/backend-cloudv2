@@ -24,8 +24,6 @@ import com.demo.adeline.repository.RespuestaRepository;
 
 @RestController
 @RequestMapping("/api/respuestas")
-//@CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @CrossOrigin(origins = "*")
 public class RespuestaController {
 
@@ -96,41 +94,39 @@ public class RespuestaController {
         return ResponseEntity.ok(resultados);
     }
     
-    @CrossOrigin(origins = "*")
-    @PostMapping("/api/respuestas/traducir")
+    @PostMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestBody Map<String, String> bodyRequest) {
         String texto = bodyRequest.get("texto");
         String target = bodyRequest.get("target");
 
-        // 📍 Usamos un servidor "Mirror" de LibreTranslate que es 100% gratuito
+        // URL espejo gratuita que NO pide API Key ni falla como LibreTranslate.com
         String url = "https://translate.argosopentech.com/translate";
         
         RestTemplate restTemplate = new RestTemplate();
         Map<String, String> resultado = new HashMap<>();
 
-        // Construimos el cuerpo exactamente como lo pide el servidor gratuito
+        // Datos para el traductor
         Map<String, String> libreBody = new HashMap<>();
         libreBody.put("q", texto);
-        libreBody.put("source", "es"); // Origen español
+        libreBody.put("source", "es");
         libreBody.put("target", target);
         libreBody.put("format", "text");
         libreBody.put("api_key", "");
 
         try {
-            // Hacemos la petición POST
+            // Hacemos la petición al servidor de traducción
             Map<String, Object> response = restTemplate.postForObject(url, libreBody, Map.class);
             
             if (response != null && response.containsKey("translatedText")) {
                 resultado.put("traducido", response.get("translatedText").toString());
             } else {
-                resultado.put("traducido", texto); // Si falla, devuelve el original
+                resultado.put("traducido", texto); 
             }
         } catch (Exception e) {
-            System.out.println("Error llamando al API: " + e.getMessage());
+            // Si el servidor de traducción falla, devolvemos el texto original para no dar error 500
             resultado.put("traducido", texto);
         }
 
         return ResponseEntity.ok(resultado);
     }
-    
 }
