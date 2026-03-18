@@ -59,6 +59,11 @@ public class RespuestaController {
 
         return ResponseEntity.ok(publicPath);
     }
-
+    
+    @GetMapping("/usuario/{usuarioId}")
+    public List<Respuesta> obtenerPorUsuario(@PathVariable Long usuarioId) {
+        // Esto llama al método que creamos en el Repository
+        return repo.findByUsuarioId(usuarioId);
+    }
 
 }
