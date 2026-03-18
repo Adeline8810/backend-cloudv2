@@ -13,11 +13,15 @@ import java.util.List;
 
 
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 import java.util.HashMap;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @RestController
 @RequestMapping("/api/respuestas")
@@ -96,30 +100,43 @@ public class RespuestaController {
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
-       // String url = "https://libretranslate.de/translate";
         String url = "https://translate.argosopentech.com/translate";
         
         RestTemplate restTemplate = new RestTemplate();
         
-        Map<String, Object> body = new HashMap<>();
-        body.put("q", texto);
-        body.put("source", "es");
-        body.put("target", target);
-        body.put("format", "text");
+        // 1. Creamos las cabeceras (Headers) indicando que enviamos un formulario
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 2. Usamos MultiValueMap para que RestTemplate lo envíe correctamente
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("q", texto);
+        map.add("source", "es");
+        map.add("target", target);
+        map.add("format", "text");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
         try {
-            Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
+            // 3. Hacemos la petición POST
+            Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
             Map<String, String> resultado = new HashMap<>();
-            resultado.put("traducido", response.get("translatedText").toString());
+            
+            if (response != null && response.containsKey("translatedText")) {
+                resultado.put("traducido", response.get("translatedText").toString());
+            } else {
+                resultado.put("traducido", texto);
+            }
             return ResponseEntity.ok(resultado);
+            
         } catch (Exception e) {
-            // Si el API gratuito falla, devolvemos el original para que no se rompa la app
+            // Si falla, imprimimos el error en la consola de Railway para saber por qué
+            System.out.println("Error en traducción: " + e.getMessage());
             Map<String, String> errorRes = new HashMap<>();
             errorRes.put("traducido", texto);
             return ResponseEntity.ok(errorRes);
         }
     }
-    
     
     
 }

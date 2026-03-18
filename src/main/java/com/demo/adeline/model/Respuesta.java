@@ -13,7 +13,7 @@ public class Respuesta {
     private Long usuarioId;
 
     @Column(columnDefinition = "TEXT")
-    private String texto;
+    private String texto; 
 
     private String fotoUrl;
 
