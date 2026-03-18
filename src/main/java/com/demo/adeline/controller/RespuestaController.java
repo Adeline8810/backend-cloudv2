@@ -93,6 +93,7 @@ public class RespuestaController {
         return ResponseEntity.ok(resultados);
     }
     
+    @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
         String url = "https://libretranslate.de/translate";
