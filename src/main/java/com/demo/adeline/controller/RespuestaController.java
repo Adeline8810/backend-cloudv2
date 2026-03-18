@@ -66,20 +66,23 @@ public class RespuestaController {
     }
     
     
- // 2. Este es el NUEVO (el que verifica si existe para actualizar o crear uno solo)
- // Le agregamos "/uno" para que no choque con el anterior
- @PostMapping("/uno") 
- public ResponseEntity<Respuesta> guardarOActualizar(@RequestBody Respuesta nuevaRespuesta) {
-     return repo.findByUsuarioIdAndPreguntaId(
-             nuevaRespuesta.getUsuarioId(), 
-             nuevaRespuesta.getPreguntaId()
-     ).map(existente -> {
-         existente.setTexto(nuevaRespuesta.getTexto());
-         existente.setFotoUrl(nuevaRespuesta.getFotoUrl());
-         return ResponseEntity.ok(repo.save(existente));
-     }).orElseGet(() -> {
-         return ResponseEntity.ok(repo.save(nuevaRespuesta));
-     });
- }
+    @PostMapping
+    public ResponseEntity<List<Respuesta>> guardarOActualizarLista(@RequestBody List<Respuesta> nuevasRespuestas) {
+        List<Respuesta> resultados = nuevasRespuestas.stream().map(nueva -> {
+            // Buscamos si el usuario ya respondió esa pregunta específica
+            return repo.findByUsuarioIdAndPreguntaId(nueva.getUsuarioId(), nueva.getPreguntaId())
+                .map(existente -> {
+                    // SI EXISTE: Actualizamos texto y foto
+                    existente.setTexto(nueva.getTexto());
+                    existente.setFotoUrl(nueva.getFotoUrl());
+                    return repo.save(existente);
+                })
+                .orElseGet(() -> {
+                    // NO EXISTE: Creamos registro nuevo
+                    return repo.save(nueva);
+                });
+        }).toList();
 
+        return ResponseEntity.ok(resultados);
+    }
 }
