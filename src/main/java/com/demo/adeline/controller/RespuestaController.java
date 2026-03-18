@@ -23,6 +23,14 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/respuestas")
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -99,46 +107,52 @@ public class RespuestaController {
     
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
-    public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
-        String url = "https://translate.astian.org/translate";
-        
-        RestTemplate restTemplate = new RestTemplate();
-        
-        // 1. Creamos las cabeceras (Headers) indicando que enviamos un formulario
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    public ResponseEntity<Map<String, String>> traducir(
+            @RequestParam String texto,
+            @RequestParam String target) {
 
-        Map<String, String> body = new HashMap<>();
-        body.put("q", texto);
-        body.put("source", "auto");
-        body.put("target", target);
-        body.put("format", "text");
+        String urlBase = "https://translate.astian.org";
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-      
+        Map<String, String> resultado = new HashMap<>();
 
         try {
-            // 3. Hacemos la petición POST
-            Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
-            Map<String, String> resultado = new HashMap<>();
-            
+            // 🔹 Creamos el body en formato JSON
+            Map<String, String> body = new HashMap<>();
+            body.put("q", texto);
+            body.put("source", "auto");
+            body.put("target", target);
+            body.put("format", "text");
+
+            // 🔹 Creamos el cliente
+            WebClient client = WebClient.create(urlBase);
+
+            // 🔹 Hacemos la petición POST
+            Map response = client.post()
+                    .uri("/translate")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            // 🔥 DEBUG (muy importante)
+            System.out.println("Respuesta API: " + response);
+
+            // 🔹 Procesamos respuesta
             if (response != null && response.get("translatedText") != null) {
                 resultado.put("traducido", response.get("translatedText").toString());
             } else {
-                resultado.put("traducido", "ERROR");
+                resultado.put("traducido", "ERROR: respuesta vacía");
             }
+
             return ResponseEntity.ok(resultado);
-            
+
         } catch (Exception e) {
             System.out.println("ERROR REAL:");
-            e.printStackTrace(); // 🔥 CLAVE
+            e.printStackTrace(); // 🔥 CLAVE para ver el fallo real
 
-            Map<String, String> errorRes = new HashMap<>();
-            errorRes.put("traducido", "ERROR");
-            return ResponseEntity.ok(errorRes);
+            resultado.put("traducido", "ERROR");
+            return ResponseEntity.ok(resultado);
         }
     }
-    
     
 }
