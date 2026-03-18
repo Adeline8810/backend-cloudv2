@@ -100,7 +100,7 @@ public class RespuestaController {
         String target = bodyRequest.get("target");
 
         // URL espejo gratuita que NO pide API Key ni falla como LibreTranslate.com
-        String url = "https://translate.argosopentech.com/translate";
+        String url = "https://translate.terraprint.co/translate";
         
         RestTemplate restTemplate = new RestTemplate();
         Map<String, String> resultado = new HashMap<>();
