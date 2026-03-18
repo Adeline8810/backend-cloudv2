@@ -1,35 +1,28 @@
 package com.demo.adeline.controller;
 
-import com.demo.adeline.model.Respuesta;
-import com.demo.adeline.repository.RespuestaRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import java.util.Map;
 import java.util.HashMap;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import java.util.List;
+import java.util.Map;
 
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.demo.adeline.model.Respuesta;
+import com.demo.adeline.repository.RespuestaRepository;
+
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/respuestas")
@@ -107,40 +100,44 @@ public class RespuestaController {
     
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
-    public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
-        // 1. Usamos este servidor que es más estable
-        String url = "https://translate.argosopentech.com/translate";
-        
-        RestTemplate restTemplate = new RestTemplate();
-        
-        // 2. Preparamos los datos EXACTAMENTE como los pide el API
-        Map<String, Object> body = new HashMap<>();
+    public Mono<ResponseEntity<Map<String, String>>> traducir(
+            @RequestParam String texto,
+            @RequestParam String target) {
+
+        String urlBase = "https://translate.astian.org";
+
+        Map<String, String> resultado = new HashMap<>();
+
+        Map<String, String> body = new HashMap<>();
         body.put("q", texto);
-        body.put("source", "es");
+        body.put("source", "auto");
         body.put("target", target);
         body.put("format", "text");
-        body.put("api_key", ""); 
 
-        try {
-            // 3. Hacemos la petición
-            Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
-            
-            Map<String, String> resultado = new HashMap<>();
-            if (response != null && response.containsKey("translatedText")) {
-                resultado.put("traducido", response.get("translatedText").toString());
-            } else {
-                resultado.put("traducido", texto); // Si no hay traducción, devolvemos original
-            }
-            
-            return ResponseEntity.ok(resultado);
-            
-        } catch (Exception e) {
-            // 4. Si falla la red, no rompemos la app, devolvemos el texto original
-            System.err.println("Error de red: " + e.getMessage());
-            Map<String, String> errorRes = new HashMap<>();
-            errorRes.put("traducido", texto);
-            return ResponseEntity.ok(errorRes);
-        }
+        WebClient client = WebClient.create(urlBase);
+
+        return client.post()
+                .uri("/translate")
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(response -> {
+                    // 🔹 Procesamos respuesta
+                    if (response != null && response.get("translatedText") != null) {
+                        resultado.put("traducido", response.get("translatedText").toString());
+                    } else {
+                        resultado.put("traducido", "ERROR: respuesta vacía");
+                    }
+                    return ResponseEntity.ok(resultado);
+                })
+                .onErrorResume(e -> {
+                    // 🔹 Captura de errores de red/DNS/servicio
+                    System.out.println("ERROR REAL:");
+                    e.printStackTrace();
+
+                    resultado.put("traducido", "ERROR: servicio no disponible");
+                    return Mono.just(ResponseEntity.ok(resultado));
+                });
     }
     
 }
