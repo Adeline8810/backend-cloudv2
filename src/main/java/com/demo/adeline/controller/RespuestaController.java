@@ -122,10 +122,17 @@ public class RespuestaController {
             Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
             Map<String, String> resultado = new HashMap<>();
             
-            if (response != null && response.containsKey("translatedText")) {
-                resultado.put("traducido", response.get("translatedText").toString());
-            } else {
-                resultado.put("traducido", texto);
+            if (response != null) {
+                System.out.println("Respuesta: " + response);
+
+                if (response.containsKey("translatedText")) {
+                    resultado.put("traducido", response.get("translatedText").toString());
+                } else if (response.containsKey("data")) {
+                    Map data = (Map) response.get("data");
+                    resultado.put("traducido", data.get("translatedText").toString());
+                } else {
+                    resultado.put("traducido", texto);
+                }
             }
             return ResponseEntity.ok(resultado);
             
