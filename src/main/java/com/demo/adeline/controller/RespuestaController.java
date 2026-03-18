@@ -99,46 +99,43 @@ public class RespuestaController {
     }
     
     @CrossOrigin(origins = "*")
-    @GetMapping("/traducir")
-    public Mono<ResponseEntity<Map<String, String>>> traducir(
-            @RequestParam String texto,
-            @RequestParam String target) {
+    @PostMapping("/api/respuestas/traducir")
+    public Mono<ResponseEntity<Map<String, String>>> traducir(@RequestBody Map<String, String> bodyRequest) {
 
-        // 🌐 URL base de LibreTranslate (activo y gratuito)
-        String urlBase = "https://libretranslate.com";
+        // 🤖 Tomamos el texto y el idioma destino del JSON
+        String texto = bodyRequest.get("texto");
+        String target = bodyRequest.get("target");
 
         Map<String, String> resultado = new HashMap<>();
 
-        // 🔹 Body de la petición JSON
-        Map<String, String> body = new HashMap<>();
-        body.put("q", texto);
-        body.put("source", "auto"); // LibreTranslate detecta el idioma automáticamente
-        body.put("target", target);
-        body.put("format", "text");
+        // 📍 API pública y vigente de traducciones
+        WebClient client = WebClient.builder()
+                .baseUrl("https://libretranslate.com")
+                .defaultHeader("Content-Type", "application/json")
+                .build();
 
-        // 🔹 Crear WebClient
-        WebClient client = WebClient.create(urlBase);
+        // 🧾 Construimos el body para LibreTranslate
+        Map<String, String> libreBody = new HashMap<>();
+        libreBody.put("q", texto);
+        libreBody.put("source", "auto");
+        libreBody.put("target", target);
+        libreBody.put("format", "text");
 
         return client.post()
                 .uri("/translate")
-                .bodyValue(body)
+                .bodyValue(libreBody)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .map(response -> {
-                    // 🔹 Procesar respuesta
                     if (response != null && response.get("translatedText") != null) {
                         resultado.put("traducido", response.get("translatedText").toString());
                     } else {
-                        resultado.put("traducido", "ERROR: respuesta vacía");
+                        resultado.put("traducido", "ERROR: respuesta vacía de la API");
                     }
                     return ResponseEntity.ok(resultado);
                 })
                 .onErrorResume(e -> {
-                    // 🔹 Captura de errores (red, DNS, etc.)
-                    System.out.println("ERROR REAL:");
-                    e.printStackTrace();
-
-                    resultado.put("traducido", "ERROR: servicio no disponible");
+                    resultado.put("traducido", "ERROR: servicio de traducción no disponible");
                     return Mono.just(ResponseEntity.ok(resultado));
                 });
     }
