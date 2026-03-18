@@ -107,51 +107,39 @@ public class RespuestaController {
     
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
-    public ResponseEntity<Map<String, String>> traducir(
-            @RequestParam String texto,
-            @RequestParam String target) {
-
-        String urlBase = "https://translate.astian.org";
-
-        Map<String, String> resultado = new HashMap<>();
+    public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
+        // 1. Usamos este servidor que es más estable
+        String url = "https://translate.argosopentech.com/translate";
+        
+        RestTemplate restTemplate = new RestTemplate();
+        
+        // 2. Preparamos los datos EXACTAMENTE como los pide el API
+        Map<String, Object> body = new HashMap<>();
+        body.put("q", texto);
+        body.put("source", "es");
+        body.put("target", target);
+        body.put("format", "text");
+        body.put("api_key", ""); 
 
         try {
-            // 🔹 Creamos el body en formato JSON
-            Map<String, String> body = new HashMap<>();
-            body.put("q", texto);
-            body.put("source", "auto");
-            body.put("target", target);
-            body.put("format", "text");
-
-            // 🔹 Creamos el cliente
-            WebClient client = WebClient.create(urlBase);
-
-            // 🔹 Hacemos la petición POST
-            Map response = client.post()
-                    .uri("/translate")
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-
-            // 🔥 DEBUG (muy importante)
-            System.out.println("Respuesta API: " + response);
-
-            // 🔹 Procesamos respuesta
-            if (response != null && response.get("translatedText") != null) {
+            // 3. Hacemos la petición
+            Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
+            
+            Map<String, String> resultado = new HashMap<>();
+            if (response != null && response.containsKey("translatedText")) {
                 resultado.put("traducido", response.get("translatedText").toString());
             } else {
-                resultado.put("traducido", "ERROR: respuesta vacía");
+                resultado.put("traducido", texto); // Si no hay traducción, devolvemos original
             }
-
+            
             return ResponseEntity.ok(resultado);
-
+            
         } catch (Exception e) {
-            System.out.println("ERROR REAL:");
-            e.printStackTrace(); // 🔥 CLAVE para ver el fallo real
-
-            resultado.put("traducido", "ERROR");
-            return ResponseEntity.ok(resultado);
+            // 4. Si falla la red, no rompemos la app, devolvemos el texto original
+            System.err.println("Error de red: " + e.getMessage());
+            Map<String, String> errorRes = new HashMap<>();
+            errorRes.put("traducido", texto);
+            return ResponseEntity.ok(errorRes);
         }
     }
     
