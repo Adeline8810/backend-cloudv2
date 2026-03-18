@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.demo.adeline.model.Respuesta;
+import com.demo.adeline.model.RespuestaAmigoDTO;
 import com.demo.adeline.repository.RespuestaRepository;
 
 @RestController
@@ -28,6 +29,8 @@ import com.demo.adeline.repository.RespuestaRepository;
 public class RespuestaController {
 
     private final RespuestaRepository repo;
+    
+  
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -121,4 +124,11 @@ public class RespuestaController {
         }
         return ResponseEntity.ok(resultado);
     }
+    
+    @GetMapping("/buscar-por-nombre")
+    public List<RespuestaAmigoDTO> buscarPorNombre(@RequestParam String nombre) {
+        return repo.buscarPorAmigo(nombre);
+    }
+    
+    
 }
