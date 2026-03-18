@@ -65,14 +65,22 @@ public class RespuestaController {
     @PostMapping
     public ResponseEntity<List<Respuesta>> guardarOActualizarLista(@RequestBody List<Respuesta> nuevasRespuestas) {
         List<Respuesta> resultados = nuevasRespuestas.stream().map(nueva -> {
-            return repo.findByUsuarioIdAndPreguntaId(nueva.getUsuarioId(), nueva.getPreguntaId())
-                .map(existente -> {
-                    existente.setTexto(nueva.getTexto());
-                    existente.setFotoUrl(nueva.getFotoUrl());
-                    return repo.save(existente);
-                })
-                .orElseGet(() -> repo.save(nueva));
-        }).toList(); // <--- Cambia esto aquí, es mucho más simple para Java 21
+            // Buscamos todas las que coincidan (por si hay duplicados)
+            List<Respuesta> existentes = repo.findByUsuarioIdAndPreguntaId(nueva.getUsuarioId(), nueva.getPreguntaId());
+            
+            if (!existentes.isEmpty()) {
+                // SI EXISTEN: Usamos la primera que encontremos
+                Respuesta existente = existentes.get(0);
+                existente.setTexto(nueva.getTexto());
+                existente.setFotoUrl(nueva.getFotoUrl());
+                return repo.save(existente);
+            } else {
+                // NO EXISTE: Creamos registro nuevo desde cero
+                // Limpiamos el ID por si Angular envió uno viejo que ya no existe
+                nueva.setId(null); 
+                return repo.save(nueva);
+            }
+        }).toList();
 
         return ResponseEntity.ok(resultados);
     }
