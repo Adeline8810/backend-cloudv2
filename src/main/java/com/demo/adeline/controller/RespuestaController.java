@@ -100,7 +100,7 @@ public class RespuestaController {
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
-        String url = "https://libretranslate.de/translate";
+        String url = "https://translate.astian.org/translate";
         
         RestTemplate restTemplate = new RestTemplate();
         
@@ -123,17 +123,10 @@ public class RespuestaController {
             Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
             Map<String, String> resultado = new HashMap<>();
             
-            if (response != null) {
-                System.out.println("Respuesta: " + response);
-
-                if (response.containsKey("translatedText")) {
-                    resultado.put("traducido", response.get("translatedText").toString());
-                } else if (response.containsKey("data")) {
-                    Map data = (Map) response.get("data");
-                    resultado.put("traducido", data.get("translatedText").toString());
-                } else {
-                    resultado.put("traducido", texto);
-                }
+            if (response != null && response.get("translatedText") != null) {
+                resultado.put("traducido", response.get("translatedText").toString());
+            } else {
+                resultado.put("traducido", "ERROR");
             }
             return ResponseEntity.ok(resultado);
             
