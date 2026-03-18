@@ -28,9 +28,8 @@ public class RespuestaController {
     }
 
     @PostMapping
-    public ResponseEntity<List<Respuesta>> guardarRespuestas(@RequestBody List<Respuesta> respuestas) {
-        List<Respuesta> saved = repo.saveAll(respuestas);
-        return ResponseEntity.ok(saved);
+    public List<Respuesta> guardarRespuestas(@RequestBody List<Respuesta> respuestas) {
+        return repo.saveAll(respuestas);
     }
 
     @PostMapping("/upload")
@@ -67,21 +66,20 @@ public class RespuestaController {
     }
     
     
-    @PostMapping
-    public ResponseEntity<Respuesta> guardarOActualizar(@RequestBody Respuesta nuevaRespuesta) {
-        // 1. Buscamos si ya existe respuesta previa
-        return repo.findByUsuarioIdAndPreguntaId(
-                nuevaRespuesta.getUsuarioId(), 
-                nuevaRespuesta.getPreguntaId()
-        ).map(respuestaExistente -> {
-            // 2. SI EXISTE: Actualizamos los datos
-            respuestaExistente.setTexto(nuevaRespuesta.getTexto());
-            respuestaExistente.setFotoUrl(nuevaRespuesta.getFotoUrl());
-            return ResponseEntity.ok(repo.save(respuestaExistente));
-        }).orElseGet(() -> {
-            // 3. NO EXISTE: Guardamos como nueva
-            return ResponseEntity.ok(repo.save(nuevaRespuesta));
-        });
-    }
+ // 2. Este es el NUEVO (el que verifica si existe para actualizar o crear uno solo)
+ // Le agregamos "/uno" para que no choque con el anterior
+ @PostMapping("/uno") 
+ public ResponseEntity<Respuesta> guardarOActualizar(@RequestBody Respuesta nuevaRespuesta) {
+     return repo.findByUsuarioIdAndPreguntaId(
+             nuevaRespuesta.getUsuarioId(), 
+             nuevaRespuesta.getPreguntaId()
+     ).map(existente -> {
+         existente.setTexto(nuevaRespuesta.getTexto());
+         existente.setFotoUrl(nuevaRespuesta.getFotoUrl());
+         return ResponseEntity.ok(repo.save(existente));
+     }).orElseGet(() -> {
+         return ResponseEntity.ok(repo.save(nuevaRespuesta));
+     });
+ }
 
 }
