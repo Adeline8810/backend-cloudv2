@@ -11,6 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.util.Map;
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/api/respuestas")
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -83,6 +91,31 @@ public class RespuestaController {
         }).toList();
 
         return ResponseEntity.ok(resultados);
+    }
+    
+    @GetMapping("/traducir")
+    public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
+        String url = "https://libretranslate.de/translate";
+        
+        RestTemplate restTemplate = new RestTemplate();
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("q", texto);
+        body.put("source", "es");
+        body.put("target", target);
+        body.put("format", "text");
+
+        try {
+            Map<String, Object> response = restTemplate.postForObject(url, body, Map.class);
+            Map<String, String> resultado = new HashMap<>();
+            resultado.put("traducido", response.get("translatedText").toString());
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            // Si el API gratuito falla, devolvemos el original para que no se rompa la app
+            Map<String, String> errorRes = new HashMap<>();
+            errorRes.put("traducido", texto);
+            return ResponseEntity.ok(errorRes);
+        }
     }
     
     
