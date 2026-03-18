@@ -131,10 +131,11 @@ public class RespuestaController {
             return ResponseEntity.ok(resultado);
             
         } catch (Exception e) {
-            // Si falla, imprimimos el error en la consola de Railway para saber por qué
-            System.out.println("Error en traducción: " + e.getMessage());
+            System.out.println("ERROR REAL:");
+            e.printStackTrace(); // 🔥 CLAVE
+
             Map<String, String> errorRes = new HashMap<>();
-            errorRes.put("traducido", texto);
+            errorRes.put("traducido", "ERROR");
             return ResponseEntity.ok(errorRes);
         }
     }
