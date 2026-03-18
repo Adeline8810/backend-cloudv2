@@ -27,10 +27,7 @@ public class RespuestaController {
         this.repo = repo;
     }
 
-    @PostMapping
-    public List<Respuesta> guardarRespuestas(@RequestBody List<Respuesta> respuestas) {
-        return repo.saveAll(respuestas);
-    }
+ 
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFoto(@RequestParam("file") MultipartFile file) throws IOException {
@@ -65,24 +62,21 @@ public class RespuestaController {
         return repo.findByUsuarioId(usuarioId);
     }
     
-    
     @PostMapping
     public ResponseEntity<List<Respuesta>> guardarOActualizarLista(@RequestBody List<Respuesta> nuevasRespuestas) {
         List<Respuesta> resultados = nuevasRespuestas.stream().map(nueva -> {
-            // Buscamos si el usuario ya respondió esa pregunta específica
             return repo.findByUsuarioIdAndPreguntaId(nueva.getUsuarioId(), nueva.getPreguntaId())
                 .map(existente -> {
-                    // SI EXISTE: Actualizamos texto y foto
                     existente.setTexto(nueva.getTexto());
                     existente.setFotoUrl(nueva.getFotoUrl());
                     return repo.save(existente);
                 })
-                .orElseGet(() -> {
-                    // NO EXISTE: Creamos registro nuevo
-                    return repo.save(nueva);
-                });
-        }).toList();
+                .orElseGet(() -> repo.save(nueva));
+        }).toList(); // <--- Cambia esto aquí, es mucho más simple para Java 21
 
         return ResponseEntity.ok(resultados);
     }
+    
+    
+    
 }
