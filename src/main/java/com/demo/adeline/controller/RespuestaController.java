@@ -96,7 +96,8 @@ public class RespuestaController {
     @CrossOrigin(origins = "*")
     @GetMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestParam String texto, @RequestParam String target) {
-        String url = "https://libretranslate.de/translate";
+       // String url = "https://libretranslate.de/translate";
+        String url = "https://translate.argosopentech.com/translate";
         
         RestTemplate restTemplate = new RestTemplate();
         
