@@ -65,5 +65,23 @@ public class RespuestaController {
         // Esto llama al método que creamos en el Repository
         return repo.findByUsuarioId(usuarioId);
     }
+    
+    
+    @PostMapping
+    public ResponseEntity<Respuesta> guardarOActualizar(@RequestBody Respuesta nuevaRespuesta) {
+        // 1. Buscamos si ya existe respuesta previa
+        return repo.findByUsuarioIdAndPreguntaId(
+                nuevaRespuesta.getUsuarioId(), 
+                nuevaRespuesta.getPreguntaId()
+        ).map(respuestaExistente -> {
+            // 2. SI EXISTE: Actualizamos los datos
+            respuestaExistente.setTexto(nuevaRespuesta.getTexto());
+            respuestaExistente.setFotoUrl(nuevaRespuesta.getFotoUrl());
+            return ResponseEntity.ok(repo.save(respuestaExistente));
+        }).orElseGet(() -> {
+            // 3. NO EXISTE: Guardamos como nueva
+            return ResponseEntity.ok(repo.save(nuevaRespuesta));
+        });
+    }
 
 }
