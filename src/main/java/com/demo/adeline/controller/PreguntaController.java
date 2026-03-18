@@ -29,4 +29,33 @@ public class PreguntaController {
         Pregunta saved = repo.save(p);
         return ResponseEntity.created(URI.create("/api/preguntas/" + saved.getId())).body(saved);
     }
+    
+    
+    // Obtener una pregunta por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Pregunta> getOne(@PathVariable Long id) {
+        return repo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
+    
+    // Actualizar pregunta
+    @PutMapping("/{id}")
+    public ResponseEntity<Pregunta> actualizar(@PathVariable Long id, @RequestBody Pregunta p) {
+        return repo.findById(id).map(existing -> {
+            existing.setTexto(p.getTexto());
+            return ResponseEntity.ok(repo.save(existing));
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Eliminar pregunta
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        if (!repo.existsById(id)) return ResponseEntity.notFound().build();
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    
 }
