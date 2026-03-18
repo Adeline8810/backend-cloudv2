@@ -104,16 +104,19 @@ public class RespuestaController {
             @RequestParam String texto,
             @RequestParam String target) {
 
-        String urlBase = "https://translate.astian.org";
+        // 🌐 URL base de LibreTranslate (activo y gratuito)
+        String urlBase = "https://libretranslate.com";
 
         Map<String, String> resultado = new HashMap<>();
 
+        // 🔹 Body de la petición JSON
         Map<String, String> body = new HashMap<>();
         body.put("q", texto);
-        body.put("source", "auto");
+        body.put("source", "auto"); // LibreTranslate detecta el idioma automáticamente
         body.put("target", target);
         body.put("format", "text");
 
+        // 🔹 Crear WebClient
         WebClient client = WebClient.create(urlBase);
 
         return client.post()
@@ -122,7 +125,7 @@ public class RespuestaController {
                 .retrieve()
                 .bodyToMono(Map.class)
                 .map(response -> {
-                    // 🔹 Procesamos respuesta
+                    // 🔹 Procesar respuesta
                     if (response != null && response.get("translatedText") != null) {
                         resultado.put("traducido", response.get("translatedText").toString());
                     } else {
@@ -131,7 +134,7 @@ public class RespuestaController {
                     return ResponseEntity.ok(resultado);
                 })
                 .onErrorResume(e -> {
-                    // 🔹 Captura de errores de red/DNS/servicio
+                    // 🔹 Captura de errores (red, DNS, etc.)
                     System.out.println("ERROR REAL:");
                     e.printStackTrace();
 
