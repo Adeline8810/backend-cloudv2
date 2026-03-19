@@ -13,7 +13,7 @@ import java.util.List;
 //@CrossOrigin(origins = "http://localhost:4200")
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 //@CrossOrigin(origins = "*")
-@CrossOrigin(origins = "https://adeline8810.github.io")
+
 public class PreguntaController {
 
     private final PreguntaRepository repo;
