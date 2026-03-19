@@ -27,7 +27,7 @@ import com.demo.adeline.repository.UsuarioRepository;
 @RestController
 @RequestMapping("/api/respuestas")
 //@CrossOrigin(origins = "*")
-@CrossOrigin(origins = "https://Adeline8810.github.io")
+@CrossOrigin(origins = "https://adeline8810.github.io")
 public class RespuestaController {
 
     private final RespuestaRepository repo;
