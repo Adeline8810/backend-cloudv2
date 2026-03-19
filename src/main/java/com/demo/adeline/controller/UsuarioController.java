@@ -14,7 +14,7 @@ import java.util.Optional;
 @RequestMapping("/api/usuarios")
 //@CrossOrigin(origins = "http://localhost:4200")
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
-@CrossOrigin(origins = "https://adeline8810.github.io") //
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     private final UsuarioRepository repo;
