@@ -1,6 +1,7 @@
 package com.demo.adeline.controller;
 
 import com.demo.adeline.model.Usuario;
+import com.demo.adeline.model.UsuarioBusquedaDTO;
 import com.demo.adeline.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,4 +75,11 @@ public class UsuarioController {
         repo.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/buscar-usuarios")
+    public List<UsuarioBusquedaDTO> buscarUsuarios(@RequestParam String nombre) {
+        // Usamos el repositorio de usuarios que ya está inyectado en este controller
+        return repo.buscarUsuariosPorTermino(nombre);
+    }
+    
 }
