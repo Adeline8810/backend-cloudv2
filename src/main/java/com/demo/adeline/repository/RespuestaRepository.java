@@ -22,12 +22,15 @@ public interface RespuestaRepository extends JpaRepository<Respuesta, Long> {
 	// Este es el nuevo método para verificar si ya respondió una pregunta específica
 	List<Respuesta> findByUsuarioIdAndPreguntaId(Long usuarioId, Long preguntaId);
 	
-	@Query("SELECT new com.demo.adeline.model.RespuestaAmigoDTO(p.texto, r.texto, u.fotoUrl) " +
-		       "FROM Respuesta r, Pregunta p, Usuario u " +
-		       "WHERE r.preguntaId = p.id " +
-		       "AND r.usuarioId = u.id " +
-		       "AND u.username = :username " +
-		       "ORDER BY p.id ASC")
+	@Query("SELECT new com.demo.adeline.model.RespuestaAmigoDTO(" +
+		       "(SELECT p.texto FROM Pregunta p WHERE p.id = r.preguntaId), " +
+		       "r.texto, " +
+		       "null) " +   // ⚠️ IMPORTANTE
+		       "FROM Respuesta r " +
+		       "WHERE r.usuarioId = (" +
+		       "   SELECT u.id FROM Usuario u WHERE u.username = :username" +
+		       ") " +
+		       "ORDER BY r.preguntaId ASC")
 		List<RespuestaAmigoDTO> buscarPorAmigo(@Param("username") String username);
 	}
 
