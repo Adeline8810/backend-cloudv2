@@ -40,7 +40,7 @@ public class RespuestaController {
     }
 
  
-
+    @CrossOrigin(origins = "https://adeline8810.github.io")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFoto(@RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
