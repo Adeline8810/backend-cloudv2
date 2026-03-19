@@ -19,8 +19,11 @@ public class CorsConfig {
 	                    .allowedOrigins("https://adeline8810.github.io")
 	                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 	                    .allowedHeaders("*")
+	                    .exposedHeaders("Authorization", "Content-Type")
 	                    .allowCredentials(true)
+	                    .maxAge(3600)
 	                    .exposedHeaders("*"); // Ayuda a que el navegador vea las respuestas
+	            
 	                       
 	        }
 	    };
