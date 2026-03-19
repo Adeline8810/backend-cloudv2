@@ -118,7 +118,7 @@ public class RespuestaController {
      * Se mantiene aquí porque usa RespuestaRepository y el DTO de respuestas
      */
     @GetMapping("/buscar-por-nombre")
-    public List<RespuestaAmigoDTO> buscarPorNombre(@RequestParam String nombre) {
-        return repo.buscarPorAmigo(nombre);
+    public List<RespuestaAmigoDTO> buscarPorNombre(@RequestParam String username) {
+        return repo.buscarPorAmigo(username);
     }
 }
