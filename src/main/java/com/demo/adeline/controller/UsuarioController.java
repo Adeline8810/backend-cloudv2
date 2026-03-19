@@ -76,10 +76,10 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
     
+ // ESTE ES EL MÉTODO QUE ME PREGUNTASTE
     @GetMapping("/buscar-usuarios")
     public List<UsuarioBusquedaDTO> buscarUsuarios(@RequestParam String nombre) {
-        // Usamos el repositorio de usuarios que ya está inyectado en este controller
-        return repo.buscarUsuariosPorTermino(nombre);
+        return repo.buscarUsuariosPorTermino(nombre); 
     }
     
 }

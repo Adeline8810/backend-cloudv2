@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.demo.adeline.model.Respuesta;
 import com.demo.adeline.model.RespuestaAmigoDTO;
 import com.demo.adeline.repository.RespuestaRepository;
+import com.demo.adeline.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/api/respuestas")
@@ -29,12 +30,14 @@ import com.demo.adeline.repository.RespuestaRepository;
 public class RespuestaController {
 
     private final RespuestaRepository repo;
+    private final UsuarioRepository usuarioRepo;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    public RespuestaController(RespuestaRepository repo) {
+    public RespuestaController(RespuestaRepository repo, UsuarioRepository usuarioRepo) {
         this.repo = repo;
+        this.usuarioRepo = usuarioRepo; // <--- AÑADE ESTO
     }
 
     @CrossOrigin(origins = "https://adeline8810.github.io")
