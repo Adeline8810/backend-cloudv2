@@ -5,66 +5,40 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "respuestas")
 public class Respuesta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Forzamos el nombre exacto de la columna para que Spring no adivine
-    @Column(name = "preguntaId") 
+    // Forzamos a Java a mirar la columna con guion bajo que tiene tus datos
+    @Column(name = "pregunta_id")
     private Long preguntaId;
 
-    @Column(name = "usuarioId")
+    @Column(name = "usuario_id")
     private Long usuarioId;
 
     @Column(columnDefinition = "TEXT")
-    private String texto; 
+    private String texto;
 
-    @Column(name = "fotoUrl")
+    // Añadimos esto para que la foto también use el nombre correcto en la tabla
+    @Column(name = "foto_url")
     private String fotoUrl;
 
-	public Long getId() {
-		return id;
-	}
+    public Respuesta() {}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public Long getPreguntaId() {
-		return preguntaId;
-	}
+    public Long getPreguntaId() { return preguntaId; }
+    public void setPreguntaId(Long preguntaId) { this.preguntaId = preguntaId; }
 
-	public void setPreguntaId(Long preguntaId) {
-		this.preguntaId = preguntaId;
-	}
+    public Long getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
 
-	public Long getUsuarioId() {
-		return usuarioId;
-	}
+    public String getTexto() { return texto; }
+    public void setTexto(String texto) { this.texto = texto; }
 
-	public void setUsuarioId(Long usuarioId) {
-		this.usuarioId = usuarioId;
-	}
-
-	public String getTexto() {
-		return texto;
-	}
-
-	public void setTexto(String texto) {
-		this.texto = texto;
-	}
-
-	public String getFotoUrl() {
-		return fotoUrl;
-	}
-
-	public void setFotoUrl(String fotoUrl) {
-		this.fotoUrl = fotoUrl;
-	}
-
-  
-    
-    
-    
-    
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 }
