@@ -41,7 +41,7 @@ public class RespuestaController {
         this.usuarioRepo = usuarioRepo; // <--- AÑADE ESTO
     }
 
-    @CrossOrigin(origins = "https://adeline8810.github.io")
+    
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFoto(@RequestParam("file") MultipartFile file,@RequestParam("usuarioId") Long usuarioId) throws IOException {
         if (file == null || file.isEmpty()) {
