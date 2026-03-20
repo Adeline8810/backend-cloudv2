@@ -24,10 +24,10 @@ public interface RespuestaRepository extends JpaRepository<Respuesta, Long> {
 	
 	@Query("SELECT new com.demo.adeline.model.RespuestaAmigoDTO(" +
 		       "(SELECT p.texto FROM Pregunta p WHERE p.id = r.preguntaId), " +
-		       "r.texto, " +
-		       "null) " +   // ⚠️ IMPORTANTE
-		       "FROM Respuesta r " +
-		       "WHERE r.usuarioId = (" +
+		       " r.texto, " +
+		       " r.fotoUrl) " +   // ⚠️ IMPORTANTE
+		       " FROM Respuesta r " +
+		       " WHERE r.usuarioId = (" +
 		       "   SELECT u.id FROM Usuario u WHERE u.username = :username" +
 		       ") " +
 		       "ORDER BY r.preguntaId ASC")
