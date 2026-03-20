@@ -20,7 +20,7 @@ public interface RespuestaRepository extends JpaRepository<Respuesta, Long> {
 	@Query("SELECT new com.demo.adeline.model.RespuestaAmigoDTO(" +
 		       "(SELECT p.texto FROM Pregunta p WHERE p.id = r.preguntaId), " +
 		       " r.texto, " +
-		       " r.fotoUrl) " +   // ⚠️ IMPORTANTE
+		       " r.fotoUrl) " +   
 		       " FROM Respuesta r " +
 		       " WHERE r.usuarioId = (" +
 		       "   SELECT u.id FROM Usuario u WHERE u.username = :username" +
