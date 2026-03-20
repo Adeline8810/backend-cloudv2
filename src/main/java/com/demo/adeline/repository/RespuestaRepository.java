@@ -1,18 +1,13 @@
 package com.demo.adeline.repository;
 
-import com.demo.adeline.model.Respuesta;
+import java.util.List;
 
-import com.demo.adeline.model.Respuesta;
-import com.demo.adeline.model.RespuestaAmigoDTO; // Importa el DTO
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.util.List;
 
-import java.util.List;
-
-
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.demo.adeline.model.Respuesta;
+import com.demo.adeline.model.RespuestaAmigoDTO; // Importa el DTO
 
 public interface RespuestaRepository extends JpaRepository<Respuesta, Long> {
 	
