@@ -15,7 +15,6 @@ import java.util.Optional;
 //@CrossOrigin(origins = "http://localhost:4200")
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 //@CrossOrigin(origins = "*")
-
 public class UsuarioController {
 
     private final UsuarioRepository repo;
