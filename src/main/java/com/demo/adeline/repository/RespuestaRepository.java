@@ -18,13 +18,11 @@ public interface RespuestaRepository extends JpaRepository<Respuesta, Long> {
 	List<Respuesta> findByUsuarioIdAndPreguntaId(Long usuarioId, Long preguntaId);
 	
 	@Query("SELECT new com.demo.adeline.model.RespuestaAmigoDTO(" +
-		       "(SELECT p.texto FROM Pregunta p WHERE p.id = r.preguntaId), " +
-		       " r.texto, " +
-		       " r.fotoUrl) " +   
-		       " FROM Respuesta r " +
-		       " WHERE r.usuarioId = (" +
-		       "   SELECT u.id FROM Usuario u WHERE u.username = :username" +
-		       ") " +
+		       "p.texto, r.texto, r.fotoUrl) " +
+		       "FROM Respuesta r " +
+		       "JOIN Pregunta p ON p.id = r.preguntaId " +
+		       "JOIN Usuario u ON u.id = r.usuarioId " +
+		       "WHERE u.username = :username " +
 		       "ORDER BY r.preguntaId ASC")
 		List<RespuestaAmigoDTO> buscarPorAmigo(@Param("username") String username);
 	}
