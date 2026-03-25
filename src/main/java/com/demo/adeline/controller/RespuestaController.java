@@ -23,7 +23,7 @@ import com.demo.adeline.model.RespuestaAmigoDTO;
 import com.demo.adeline.repository.RespuestaRepository;
 
 
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/api/respuestas")
 public class RespuestaController {
