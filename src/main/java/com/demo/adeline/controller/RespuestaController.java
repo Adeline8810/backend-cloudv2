@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.demo.adeline.model.Respuesta;
@@ -24,8 +25,8 @@ import com.demo.adeline.repository.RespuestaRepository;
 
 
 
-@RestController
-@RequestMapping("/api/respuestas")
+	@RestController
+	@RequestMapping("/api/respuestas")
 public class RespuestaController {
 
     private final RespuestaRepository repo;
@@ -99,8 +100,30 @@ public class RespuestaController {
     // El resto del código (traducir y buscar-por-nombre) se queda igual.
     @PostMapping("/traducir")
     public ResponseEntity<Map<String, String>> traducir(@RequestBody Map<String, String> bodyRequest) {
-        // ... (tu código de traducción)
-        return ResponseEntity.ok(new HashMap<>()); // simplificado para el ejemplo
+        String texto = bodyRequest.get("texto");
+        String target = bodyRequest.get("target");
+
+        // 🚀 Usamos el motor de Google (vía script gratuito)
+        String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=" + target + "&dt=t&q=" + texto;
+        
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, String> resultado = new HashMap<>();
+
+        try {
+            // Google devuelve un Array extraño, así que lo recibimos como Object
+            Object[] response = restTemplate.getForObject(url, Object[].class);
+            
+            // Extraemos la traducción del formato de Google
+            if (response != null) {
+                String traducido = ((List)((List)response[0]).get(0)).get(0).toString();
+                resultado.put("traducido", traducido);
+            } else {
+                resultado.put("traducido", texto);
+            }
+        } catch (Exception e) {
+            resultado.put("traducido", texto);
+        }
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/buscar-por-nombre")
