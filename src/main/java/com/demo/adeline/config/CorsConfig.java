@@ -15,7 +15,8 @@ public class CorsConfig {
 	        @Override
 	        public void addCorsMappings(CorsRegistry registry) {
 	        	registry.addMapping("/**")
-	            .allowedOrigins("https://adeline8810.github.io")
+	            //.allowedOrigins("https://adeline8810.github.io")
+	            .allowedOriginPatterns("*")
 	            .allowedMethods("*")
 	            .allowedHeaders("*")
 	            .allowCredentials(true)
