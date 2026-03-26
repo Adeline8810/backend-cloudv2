@@ -30,6 +30,7 @@ public class UsuarioController {
 
     @PostMapping("/register")
     public ResponseEntity<Usuario> register(@RequestBody Usuario u) {
+          	u.setId(null);
         if (u.getUsername() == null || u.getEmail() == null || u.getPassword() == null) {
             return ResponseEntity.badRequest().build();
         }
