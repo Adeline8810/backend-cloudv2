@@ -15,16 +15,11 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    // Aquí ponemos las URLs reales de donde viene tu Front-end
-                    .allowedOrigins(
-                        "https://adeline8810.github.io", 
-                        "http://localhost:5173", 
-                        "http://localhost:3000"
-                    )
+                    // IMPORTANTE: No uses "*". Pon las URLs específicas.
+                    .allowedOrigins("https://adeline8810.github.io", "http://localhost:4200", "http://localhost:8080")
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
-                    .allowCredentials(true)
-                    .maxAge(3600);
+                    .allowCredentials(true);
             }
         };
     }

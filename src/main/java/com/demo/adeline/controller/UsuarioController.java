@@ -15,6 +15,7 @@ import java.util.Optional;
 //@CrossOrigin(origins = "http://localhost:4200")
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 //@CrossOrigin(origins = "*")
+
 public class UsuarioController {
 
     private final UsuarioRepository repo;
@@ -30,7 +31,6 @@ public class UsuarioController {
 
     @PostMapping("/register")
     public ResponseEntity<Usuario> register(@RequestBody Usuario u) {
-          	u.setId(null);
         if (u.getUsername() == null || u.getEmail() == null || u.getPassword() == null) {
             return ResponseEntity.badRequest().build();
         }
