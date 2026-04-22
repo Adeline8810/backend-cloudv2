@@ -83,4 +83,17 @@ public class UsuarioController {
         return repo.buscarUsuariosPorTermino(nombre); 
     }
     
+    
+ // Este método usa el findByUsername que ya tienes en el repositorio
+    @GetMapping("/monedas/{username}")
+    public ResponseEntity<Usuario> obtenerDatosRecarga(@PathVariable String username) {
+        return repo.findByUsername(username)
+                .map(usuario -> {
+                    // Limpiamos el password por seguridad antes de enviarlo al Front
+                    usuario.setPassword(null);
+                    return ResponseEntity.ok(usuario);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
 }
