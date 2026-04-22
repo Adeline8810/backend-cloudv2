@@ -19,6 +19,10 @@ public class Usuario {
 
     @Column(nullable=false)
     private String password;
+    
+    private Integer monedas;
+    
+    
 
     public Usuario() {}
 
@@ -27,6 +31,7 @@ public class Usuario {
         this.nombre = nombre;
         this.email = email;
         this.password = password;
+        this.monedas = monedas;
     }
 
     // Getters / setters
@@ -44,4 +49,7 @@ public class Usuario {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    
+    public Integer getMonedas() { return monedas; }
+    public void setMonedas(Integer monedas) { this.monedas = monedas; }
 }

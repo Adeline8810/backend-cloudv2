@@ -21,5 +21,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     	       "WHERE u.nombre LIKE %:termino% OR u.email LIKE %:termino% OR u.username LIKE %:termino%")
     	List<UsuarioBusquedaDTO> buscarUsuariosPorTermino(@Param("termino") String termino);
    
-    
+  
 }
