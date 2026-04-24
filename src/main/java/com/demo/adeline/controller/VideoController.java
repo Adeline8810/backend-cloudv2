@@ -19,9 +19,10 @@ public class VideoController {
     private final VideoRepository videoRepo;
     private final UsuarioRepository usuarioRepo;
     
-    // Carpeta donde se guardarán los videos en Render
-    private final String UPLOAD_DIR = "uploads/";
+    // Carpeta temporal permitida en Render
+    private final String UPLOAD_DIR = "/tmp/uploads/";
 
+    // Constructor (Inyección de dependencias)
     public VideoController(VideoRepository videoRepo, UsuarioRepository usuarioRepo) {
         this.videoRepo = videoRepo;
         this.usuarioRepo = usuarioRepo;
@@ -37,23 +38,34 @@ public class VideoController {
             @RequestParam("video") MultipartFile file,
             @PathVariable Long usuarioId) throws IOException {
 
-        // 1. Buscamos si el usuario existe
+        // 1. Validar usuario y archivo
         Usuario user = usuarioRepo.findById(usuarioId).orElse(null);
-        if (user == null || file.isEmpty()) return ResponseEntity.badRequest().build();
+        if (user == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        // 2. Guardar el archivo en el servidor
+        // 2. Asegurar que el directorio de subida existe
+        Path directoryPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(directoryPath)) {
+            Files.createDirectories(directoryPath);
+        }
+
+        // 3. Generar nombre único y guardar archivo
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path path = Paths.get(UPLOAD_DIR + fileName);
-        Files.createDirectories(path.getParent());
-        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        Path filePath = directoryPath.resolve(fileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        // 3. Guardar la información en la tabla 'videos' de Supabase
+        // 4. Crear objeto Video para la base de datos
         Video v = new Video();
         v.setTitulo(file.getOriginalFilename());
-        // URL completa para que Angular la pueda reproducir
+        // URL que WebConfig servirá desde /tmp/uploads/
         v.setUrlVideo("https://backend-ruth-slam.onrender.com/uploads/" + fileName);
         v.setUsuario(user);
+        
+        // Dejamos thumbnail nulo o vacío para evitar errores de tamaño de columna
+        v.setThumbnail(null); 
 
+        // 5. Guardar en Supabase y retornar
         return ResponseEntity.ok(videoRepo.save(v));
     }
 }
