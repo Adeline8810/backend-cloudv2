@@ -23,13 +23,15 @@ import com.demo.adeline.model.Respuesta;
 import com.demo.adeline.model.RespuestaAmigoDTO;
 import com.demo.adeline.repository.RespuestaRepository;
 
-
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 	@RestController
 	@RequestMapping("/api/respuestas")
 public class RespuestaController {
 
     private final RespuestaRepository repo;
+    private final Cloudinary cloudinary;
     // 1. ELIMINAMOS la referencia a UsuarioRepository si no la vas a usar, 
     // para que Spring no busque un frijol (bean) que no existe.
 
@@ -37,8 +39,9 @@ public class RespuestaController {
     private String uploadDir;
 
     // 2. CONSTRUCTOR LIMPIO: Solo lo que realmente inyectas.
-    public RespuestaController(RespuestaRepository repo) {
+    public RespuestaController(RespuestaRepository repo,Cloudinary cloudinary) {
         this.repo = repo;
+        this.cloudinary = cloudinary;
     }
 
     @PostMapping("/upload")
@@ -47,22 +50,15 @@ public class RespuestaController {
             return ResponseEntity.badRequest().body("No file");
         }
 
-        String projectPath = System.getProperty("user.dir");
-        File dir = new File(projectPath, uploadDir);
+        // SUBIDA DIRECTA A CLOUDINARY
+        var uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+            "folder", "perfiles",
+            "resource_type", "image"
+        ));
 
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        String filename = System.currentTimeMillis() + "-" +
-                file.getOriginalFilename().replaceAll("\\s+", "_");
-
-        File dest = new File(dir, filename);
-        file.transferTo(dest);
-
-        // Retornamos el path relativo
-        String publicPath = "/uploads/" + filename;
-        return ResponseEntity.ok(publicPath);
+        // Retornamos la URL segura que nos da Cloudinary
+        String urlCloudinary = uploadResult.get("secure_url").toString();
+        return ResponseEntity.ok(urlCloudinary);
     }
     
     // 3. CAMBIO IMPORTANTE: Agregamos un try-catch aquí para que no "explote" el servidor
