@@ -1,5 +1,7 @@
 package com.demo.adeline.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.demo.adeline.model.Video;
 import com.demo.adeline.model.Usuario;
 import com.demo.adeline.repository.VideoRepository;
@@ -9,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/videos")
@@ -18,14 +20,13 @@ public class VideoController {
 
     private final VideoRepository videoRepo;
     private final UsuarioRepository usuarioRepo;
-    
-    // Carpeta temporal permitida en Render
-    private final String UPLOAD_DIR = "/tmp/uploads/";
+    private final Cloudinary cloudinary; // 1. Nueva dependencia
 
-    // Constructor (Inyección de dependencias)
-    public VideoController(VideoRepository videoRepo, UsuarioRepository usuarioRepo) {
+    // 2. Constructor actualizado con Cloudinary
+    public VideoController(VideoRepository videoRepo, UsuarioRepository usuarioRepo, Cloudinary cloudinary) {
         this.videoRepo = videoRepo;
         this.usuarioRepo = usuarioRepo;
+        this.cloudinary = cloudinary;
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -44,28 +45,31 @@ public class VideoController {
             return ResponseEntity.badRequest().build();
         }
 
-        // 2. Asegurar que el directorio de subida existe
-        Path directoryPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(directoryPath)) {
-            Files.createDirectories(directoryPath);
+        try {
+            // 2. SUBIR A CLOUDINARY
+            // "resource_type", "video" es obligatorio para archivos .mp4, .mov, etc.
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), 
+                    ObjectUtils.asMap("resource_type", "video"));
+
+            // 3. OBTENER LA URL SEGURA
+            String urlCloudinary = (String) uploadResult.get("secure_url");
+
+            // 4. Crear objeto Video para la base de datos
+            Video v = new Video();
+            v.setTitulo(file.getOriginalFilename());
+            
+            // Usamos la URL de Cloudinary (esta nunca cambia y no se borra)
+            v.setUrlVideo(urlCloudinary); 
+            
+            v.setUsuario(user);
+            v.setThumbnail(null); 
+
+            // 5. Guardar en tu base de datos y retornar
+            return ResponseEntity.ok(videoRepo.save(v));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
-
-        // 3. Generar nombre único y guardar archivo
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path filePath = directoryPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        // 4. Crear objeto Video para la base de datos
-        Video v = new Video();
-        v.setTitulo(file.getOriginalFilename());
-        // URL que WebConfig servirá desde /tmp/uploads/
-        v.setUrlVideo("https://backend-ruth-slam.onrender.com/uploads/" + fileName);
-        v.setUsuario(user);
-        
-        // Dejamos thumbnail nulo o vacío para evitar errores de tamaño de columna
-        v.setThumbnail(null); 
-
-        // 5. Guardar en Supabase y retornar
-        return ResponseEntity.ok(videoRepo.save(v));
     }
 }
