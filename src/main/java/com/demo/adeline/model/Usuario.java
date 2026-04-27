@@ -22,6 +22,8 @@ public class Usuario {
     
     private Integer monedas;
     
+    private String fotoUrl;
+    
     
 
     public Usuario() {}
@@ -52,4 +54,7 @@ public class Usuario {
     
     public Integer getMonedas() { return monedas; }
     public void setMonedas(Integer monedas) { this.monedas = monedas; }
+    
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 }

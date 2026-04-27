@@ -6,6 +6,12 @@ import com.demo.adeline.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Los que te faltaban o son nuevos:
+import com.cloudinary.Cloudinary;           // <--- ESTE ES EL QUE TE DABA ERROR
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;                 // <--- Añade este para los errores de subida
+
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +25,11 @@ import java.util.Optional;
 public class UsuarioController {
 
     private final UsuarioRepository repo;
+    private final Cloudinary cloudinary;
 
-    public UsuarioController(UsuarioRepository repo) {
+    public UsuarioController(UsuarioRepository repo,Cloudinary cloudinary) {
         this.repo = repo;
+        this.cloudinary = cloudinary;
     }
 
     @GetMapping
@@ -101,6 +109,27 @@ public class UsuarioController {
         return ResponseEntity.ok("Servidor despertado correctamente");
     }
     
+    @PostMapping("/upload-foto")
+    public ResponseEntity<String> uploadFotoPerfil(@RequestParam("file") MultipartFile file, @RequestParam("usuarioId") Long usuarioId) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Archivo vacío");
+        }
+
+        // A. Subir a Cloudinary
+        var uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+            "folder", "perfiles_usuarios",
+            "resource_type", "image"
+        ));
+
+        String urlCloudinary = uploadResult.get("secure_url").toString();
+
+        // B. Guardar en la tabla Usuario
+        return repo.findById(usuarioId).map(usuario -> {
+            usuario.setFotoUrl(urlCloudinary); // Asegúrate de que Usuario.java tenga este campo
+            repo.save(usuario);
+            return ResponseEntity.ok(urlCloudinary);
+        }).orElseGet(() -> ResponseEntity.status(404).body("Usuario no encontrado"));
+    }
     
     
 }
