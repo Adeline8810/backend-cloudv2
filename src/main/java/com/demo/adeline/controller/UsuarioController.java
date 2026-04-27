@@ -104,6 +104,18 @@ public class UsuarioController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
+    @GetMapping("/perfil/{username}")
+    public ResponseEntity<Usuario> obtenerPerfilPublico(@PathVariable String username) {
+        return repo.findByUsername(username)
+                .map(usuario -> {
+                    // Seteamos a null datos sensibles antes de enviar
+                    usuario.setPassword(null);
+                    // Aquí podrías setear a null el email si quieres que sea privado
+                    return ResponseEntity.ok(usuario);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("Servidor despertado correctamente");
