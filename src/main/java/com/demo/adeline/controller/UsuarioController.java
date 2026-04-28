@@ -16,20 +16,26 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import com.demo.adeline.model.Mensaje;
+import com.demo.adeline.repository.MensajeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 @RestController
 @RequestMapping("/api/usuarios")
-//@CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "*", allowedHeaders = "*")
-//@CrossOrigin(origins = "*")
 
 public class UsuarioController {
 
     private final UsuarioRepository repo;
     private final Cloudinary cloudinary;
+    private final MensajeRepository mensajeRepo;
+    
+    
 
-    public UsuarioController(UsuarioRepository repo,Cloudinary cloudinary) {
+    public UsuarioController(UsuarioRepository repo,Cloudinary cloudinary, MensajeRepository mensajeRepo) {
         this.repo = repo;
         this.cloudinary = cloudinary;
+        this.mensajeRepo = mensajeRepo;
     }
 
     @GetMapping
@@ -144,6 +150,10 @@ public class UsuarioController {
     }
     
     
+    @GetMapping("/chat/historial")
+    public List<Mensaje> obtenerHistorial(@RequestParam Long emisorId, @RequestParam Long receptorId) {
+        return mensajeRepo.obtenerHistorial(emisorId, receptorId);
+    }
     
     
 }
