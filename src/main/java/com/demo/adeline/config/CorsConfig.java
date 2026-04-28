@@ -5,21 +5,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+
 @Configuration
 public class CorsConfig {
-
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    // Usamos allowedOriginPatterns para evitar conflictos con allowCredentials
                     .allowedOriginPatterns(
-                        "https://adeline8810.github.io", 
+                        "https://adeline8810.github.io", // Tu frontend
                         "http://localhost:4200", 
-                        "http://localhost:8080",
-                        "https://backend-ruth-slam.onrender.com"
+                        "https://backend-ruth-slam.onrender.com" // Tu backend
                     )
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")

@@ -20,9 +20,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // El punto de conexión para el cliente (Angular)
         registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns("*") // Permite conexiones de cualquier origen para pruebas
+                .setAllowedOriginPatterns(
+                    "https://adeline8810.github.io", 
+                    "http://localhost:4200"
+                ) // QUITAMOS EL "*" Y PONEMOS LOS DOMINIOS REALES
                 .withSockJS();
     }
 }
