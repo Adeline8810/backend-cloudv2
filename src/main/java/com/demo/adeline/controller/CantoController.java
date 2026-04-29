@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.utils.ObjectUtils;
 import com.demo.adeline.model.Canto;
 import com.demo.adeline.repository.CantoRepository;
+
+import java.util.List;
 import java.util.Map;
 
 
@@ -40,5 +42,12 @@ public class CantoController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
+    }
+    
+    
+    
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Canto>> obtenerPorUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(cantoRepository.findByUsuarioId(usuarioId));
     }
 }
