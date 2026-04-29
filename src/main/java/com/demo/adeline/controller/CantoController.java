@@ -26,9 +26,9 @@ public class CantoController {
         @RequestParam("usuarioId") Long usuarioId) { // Ahora recibimos el ID
         try {
             // 1. Subir a Cloudinary
-            Map uploadResult = cloudinary.uploader().upload(archivo.getBytes(), 
-                ObjectUtils.asMap("resource_type", "auto")); 
-            String urlFinal = uploadResult.get("url").toString();
+        	Map uploadResult = cloudinary.uploader().upload(archivo.getBytes(), 
+        		    ObjectUtils.asMap("resource_type", "video", "format", "wav"));
+          	String urlFinal = uploadResult.get("secure_url").toString();
 
             // 2. Guardar en DB
             Canto nuevoCanto = new Canto();
