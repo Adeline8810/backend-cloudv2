@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cantos")
-@CrossOrigin(origins = "*") // Para que Angular no tenga problemas de permisos
+
 public class CantoController {
 
     @Autowired
