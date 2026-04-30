@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 @RestController
 @RequestMapping("/api/canciones")
-@CrossOrigin(origins = "*")
+
 public class CancionController {
 
     @Autowired
