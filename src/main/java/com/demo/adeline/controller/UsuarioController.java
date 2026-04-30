@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.demo.adeline.model.Mensaje;
+import com.demo.adeline.model.PerfilUsuarioDTO;
 import com.demo.adeline.repository.MensajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -156,4 +157,43 @@ public class UsuarioController {
     }
     
     
+ // POR ESTE NUEVO (Cambiamos la ruta a /perfil-completo/ para que no choque):
+    @GetMapping("/perfil-completo/{idPublico}")
+    public ResponseEntity<?> obtenerPerfilCompleto(@PathVariable String idPublico) {
+        return repo.findByIdPublico(idPublico)
+            .map(user -> {
+                PerfilUsuarioDTO perfil = new PerfilUsuarioDTO();
+                perfil.setId(user.getId());
+                perfil.setIdPublico(user.getIdPublico());
+                perfil.setNombre(user.getNombre());
+                perfil.setFotoPerfil(user.getFotoUrl()); // Usamos fotoUrl que ya tienes
+                perfil.setFotoPortada(user.getFotoPortada());
+                perfil.setBio(user.getBio());
+                perfil.setSigno(user.getSigno());
+                perfil.setSexo(user.getSexo());
+                
+                // Mapeo de insignias y escudos
+                perfil.setInsignias(user.getInsignias().stream().map(i -> i.getIconoUrl()).toList());
+                perfil.setEscudos(user.getEscudos().stream().map(e -> e.getIconoUrl()).toList());
+                
+                perfil.setTotalFollowers(0); 
+                perfil.setTotalFollowing(0);
+                
+                return ResponseEntity.ok(perfil);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @PutMapping("/completar-perfil/{id}")
+    public ResponseEntity<?> completarPerfil(@PathVariable Long id, @RequestBody Usuario datos) {
+        return repo.findById(id).map(user -> {
+            if (datos.getBio() != null) user.setBio(datos.getBio());
+            if (datos.getSigno() != null) user.setSigno(datos.getSigno());
+            if (datos.getSexo() != null) user.setSexo(datos.getSexo());
+            if (datos.getCumpleanos() != null) user.setCumpleanos(datos.getCumpleanos());
+            
+            repo.save(user);
+            return ResponseEntity.ok("Perfil actualizado correctamente");
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }
