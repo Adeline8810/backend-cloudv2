@@ -79,4 +79,10 @@ public class VideoController {
         return ResponseEntity.ok("Servidor despertado");
     }
     
+    @GetMapping("/todos")
+    public ResponseEntity<List<Video>> listarTodoElContenido() {
+        // Busca todos los videos de la tabla 'video' sin filtrar por usuario
+        return ResponseEntity.ok(videoRepo.findAll());
+    }
+    
 }

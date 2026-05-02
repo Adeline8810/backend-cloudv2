@@ -64,4 +64,10 @@ public class CantoController {
         return ResponseEntity.ok(cantoRepository.findByUsuarioId(usuarioId));
     }
     
+    @GetMapping("/todos")
+    public ResponseEntity<List<Canto>> listarTodosLosCantos() {
+        // Busca todos los registros de la tabla 'cantos'
+        return ResponseEntity.ok(cantoRepository.findAll());
+    }
+    
 }
