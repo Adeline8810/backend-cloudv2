@@ -30,9 +30,9 @@ public class ComentarioController {
     // Listar comentarios de un video
  // En com.demo.adeline.controller.ComentarioController
     @GetMapping("/video/{videoId}")
-    public ResponseEntity<?> listarPorVideo(@PathVariable Long videoId, @RequestParam Long usuarioLogueadoId) {
+    public ResponseEntity<?> listarPorVideo(@PathVariable Long videoId, @RequestParam(required = false) Long usuarioLogueadoId) {
         try {
-            List<ComentarioDTO> lista = comentarioRepository.findComentariosConUsuarioYLike(videoId, usuarioLogueadoId);
+            List<ComentarioDTO> lista = comentarioRepository.findComentariosConLikesYEstado(videoId, usuarioLogueadoId);
             return ResponseEntity.ok(lista);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
