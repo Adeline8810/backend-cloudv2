@@ -1,6 +1,7 @@
 package com.demo.adeline.controller;
 
 import com.demo.adeline.model.Comentario;
+import com.demo.adeline.model.ComentarioDTO;
 import com.demo.adeline.repository.ComentarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +31,11 @@ public class ComentarioController {
     @GetMapping("/video/{videoId}")
     public ResponseEntity<?> listarPorVideo(@PathVariable Long videoId) {
         try {
-            List<Comentario> lista = comentarioRepository.findByVideoIdOrderByFechaDesc(videoId);
-            return ResponseEntity.ok(lista);
+            // Ahora llamamos al nuevo método del repositorio que trae nombres y fotos
+            List<ComentarioDTO> comentarios = comentarioRepository.findComentariosByVideoId(videoId);
+            return ResponseEntity.ok(comentarios);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al obtener comentarios: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
@@ -47,4 +49,6 @@ public class ComentarioController {
             return ResponseEntity.status(500).body("Error al eliminar");
         }
     }
+    
+    
 }
