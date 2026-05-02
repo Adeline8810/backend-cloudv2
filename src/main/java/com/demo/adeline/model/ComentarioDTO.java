@@ -9,19 +9,21 @@ public class ComentarioDTO {
     private Long usuarioId;
     private String nombreUsuario; // <-- Lo que necesitamos
     private String usuarioFoto;   // <-- Lo que necesitamos
-    private Integer likesCount;
+    private Long likesCount;      // Cambiado a Long porque COUNT devuelve Long
+    private boolean dioLike;      // ¡FALTABA ESTO!
 
     // Constructor para que sea fácil de mapear
     public ComentarioDTO(Long id, String contenido, LocalDateTime fecha, Long usuarioId, 
-                         String nombreUsuario, String usuarioFoto, Integer likesCount) {
-        this.id = id;
-        this.contenido = contenido;
-        this.fecha = fecha;
-        this.usuarioId = usuarioId;
-        this.nombreUsuario = nombreUsuario;
-        this.usuarioFoto = usuarioFoto;
-        this.likesCount = likesCount;
-    }
+            String nombreUsuario, String usuarioFoto, Long likesCount, boolean dioLike) {
+	this.id = id;
+	this.contenido = contenido;
+	this.fecha = fecha;
+	this.usuarioId = usuarioId;
+	this.nombreUsuario = nombreUsuario;
+	this.usuarioFoto = usuarioFoto;
+	this.likesCount = likesCount;
+	this.dioLike = dioLike;
+	}
 
 	public Long getId() {
 		return id;
@@ -71,13 +73,22 @@ public class ComentarioDTO {
 		this.usuarioFoto = usuarioFoto;
 	}
 
-	public Integer getLikesCount() {
+	public Long getLikesCount() {
 		return likesCount;
 	}
 
-	public void setLikesCount(Integer likesCount) {
+	public void setLikesCount(Long likesCount) {
 		this.likesCount = likesCount;
 	}
+
+	public boolean isDioLike() {
+		return dioLike;
+	}
+
+	public void setDioLike(boolean dioLike) {
+		this.dioLike = dioLike;
+	}
+
 
     
     
