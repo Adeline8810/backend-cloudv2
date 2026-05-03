@@ -39,12 +39,14 @@ public class Usuario {
     private String bio;
     private String sexo;
     
+    private String firebaseUid;
+    
     
 
     public Usuario() {}
 
     public Usuario(String username, String nombre, String email, String password,int monedas,
-    		String idPublico,String fotoPortada, String signo,LocalDate cumpleanos,String bio,String sexo) {
+    		String idPublico,String fotoPortada, String signo,LocalDate cumpleanos,String bio,String sexo,String firebaseUid) {
         this.username = username;
         this.nombre = nombre;
         this.email = email;
@@ -56,6 +58,7 @@ public class Usuario {
         this.cumpleanos=cumpleanos;
         this.bio=bio;
         this.sexo=sexo;
+        this.firebaseUid = firebaseUid;
     }
     
     
@@ -152,8 +155,14 @@ public class Usuario {
 	public void setEscudos(Set<Escudo> escudos) {
 		this.escudos = escudos;
 	}
+
+	public String getFirebaseUid() {
+		return firebaseUid;
+	}
+
+	public void setFirebaseUid(String firebaseUid) {
+		this.firebaseUid = firebaseUid;
+	}
     
-    
-    
-    
+
 }

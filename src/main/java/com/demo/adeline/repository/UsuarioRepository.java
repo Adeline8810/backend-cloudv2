@@ -15,6 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByUsername(String username);
     Optional<Usuario> findByEmail(String email);
     
+    Optional<Usuario> findByFirebaseUid(String firebaseUid);
     
     @Query("SELECT new com.demo.adeline.model.UsuarioBusquedaDTO(u.id, u.nombre, u.email, u.username) " +
     	       "FROM Usuario u " +
@@ -23,5 +24,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
     Optional<Usuario> findByIdPublico(String idPublico);
    
+    
   
 }

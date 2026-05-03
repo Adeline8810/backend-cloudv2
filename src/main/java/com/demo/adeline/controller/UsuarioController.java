@@ -3,6 +3,10 @@ package com.demo.adeline.controller;
 import com.demo.adeline.model.Usuario;
 import com.demo.adeline.model.UsuarioBusquedaDTO;
 import com.demo.adeline.repository.UsuarioRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,9 @@ import com.demo.adeline.model.Mensaje;
 import com.demo.adeline.model.PerfilUsuarioDTO;
 import com.demo.adeline.repository.MensajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map; // Para el @RequestBody Map<String, String>
+import org.springframework.http.HttpStatus; // Para HttpStatus.UNAUTHORIZED
+import com.google.firebase.auth.FirebaseAuthException;
 
 
 @RestController
@@ -196,4 +203,37 @@ public class UsuarioController {
             return ResponseEntity.ok("Perfil actualizado correctamente");
         }).orElse(ResponseEntity.notFound().build());
     }
+    
+    
+    @PostMapping("/auth/firebase")
+    public ResponseEntity<?> loginConFirebase(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            
+            // Verificamos el token con Firebase
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            String uid = decodedToken.getUid();
+            
+            // CORRECCIÓN AQUÍ: Usamos .orElse(null) porque el repo devuelve Optional
+            Usuario usuario = repo.findByFirebaseUid(uid).orElse(null);
+            
+            if (usuario == null) {
+                usuario = new Usuario();
+                usuario.setFirebaseUid(uid);
+                usuario.setEmail(decodedToken.getEmail());
+                usuario.setNombre(decodedToken.getName());
+                usuario.setMonedas(0); 
+                repo.save(usuario);
+            }
+            
+            return ResponseEntity.ok(usuario);
+            
+        } catch (FirebaseAuthException e) {
+            // Asegúrate de que el import de HttpStatus esté arriba
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de seguridad: " + e.getMessage());
+        }
+    }
+   
+    
+    
 }
