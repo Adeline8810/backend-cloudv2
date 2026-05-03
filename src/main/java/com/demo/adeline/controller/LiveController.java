@@ -40,6 +40,22 @@ public class LiveController {
             return ResponseEntity.status(500).body("Error al finalizar live");
         }
     }
+    
+ // Agrega este nuevo método para finalizar usando el ID del usuario
+    @PostMapping("/finalizar/usuario/{usuarioId}")
+    public ResponseEntity<?> finalizarPorUsuario(@PathVariable Long usuarioId) {
+        try {
+            // Buscamos el live activo de ese usuario y lo cerramos
+            java.util.Optional<Live> liveActivo = liveRepository.findByUsuarioIdAndEstado(usuarioId, "EN_VIVO");
+            if (liveActivo.isPresent()) {
+                liveService.finalizarLive(liveActivo.get().getId());
+                return ResponseEntity.ok("Live finalizado");
+            }
+            return ResponseEntity.ok("No había live activo");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error");
+        }
+    }
 
     // 3. Listar todos los que están EN VIVO ahora mismo
     @GetMapping("/activos")
