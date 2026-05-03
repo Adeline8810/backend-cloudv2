@@ -15,7 +15,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique=true, nullable=false)
+    @Column(unique=true, nullable=true)
     private String username;
 
     private String nombre;
@@ -23,7 +23,7 @@ public class Usuario {
     @Column(unique=true, nullable=false)
     private String email;
 
-    @Column(nullable=false)
+    @Column(nullable=true)
     private String password;
     
     private Integer monedas;

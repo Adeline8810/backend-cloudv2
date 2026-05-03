@@ -7,22 +7,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
  
 import java.io.FileInputStream;
+import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Bean
+	@Bean
     public FirebaseApp firebaseApp() throws IOException {
-        // Esta ruta debe coincidir con el nombre del JSON que descargaste
-        FileInputStream serviceAccount =
-                new FileInputStream("src/main/resources/firebase-service-account.json");
+        // ClassPathResource busca dentro del JAR empaquetado, que es lo que Render necesita
+        InputStream serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
 
-        // Evita que se intente inicializar dos veces si reinicias la app
         if (FirebaseApp.getApps().isEmpty()) {
             return FirebaseApp.initializeApp(options);
         } else {

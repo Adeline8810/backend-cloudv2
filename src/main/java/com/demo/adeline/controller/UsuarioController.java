@@ -221,6 +221,8 @@ public class UsuarioController {
                 usuario = new Usuario();
                 usuario.setFirebaseUid(uid);
                 usuario.setEmail(decodedToken.getEmail());
+                usuario.setUsername(decodedToken.getEmail());
+                usuario.setPassword("FIREBASE_AUTH");
                 usuario.setNombre(decodedToken.getName());
                 usuario.setMonedas(0); 
                 repo.save(usuario);
