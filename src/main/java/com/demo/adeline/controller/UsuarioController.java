@@ -204,7 +204,7 @@ public class UsuarioController {
         }).orElse(ResponseEntity.notFound().build());
     }
     
-    
+    /*
     @PostMapping("/auth/firebase")
     public ResponseEntity<?> loginConFirebase(@RequestBody Map<String, String> body) {
         try {
@@ -233,6 +233,35 @@ public class UsuarioController {
         } catch (FirebaseAuthException e) {
             // Asegúrate de que el import de HttpStatus esté arriba
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de seguridad: " + e.getMessage());
+        }
+    }*/
+    
+    @PostMapping("/auth/firebase")
+    public ResponseEntity<?> loginConFirebase(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            String uid = decodedToken.getUid();
+            
+            // Buscamos por el UID de Firebase
+            Usuario usuario = repo.findByFirebaseUid(uid).orElse(null);
+            
+            if (usuario == null) {
+                usuario = new Usuario();
+                usuario.setFirebaseUid(uid); // Esto se guardará en la columna firebase_uid
+                usuario.setEmail(decodedToken.getEmail());
+                usuario.setUsername(decodedToken.getEmail()); // O decodedToken.getName()
+                usuario.setNombre(decodedToken.getName());
+                usuario.setPassword("FIREBASE_AUTH");
+                usuario.setMonedas(0);
+                usuario.setIdPublico(uid); // También lo guardamos aquí para que no sea NULL en la tabla
+                usuario = repo.save(usuario); // Guardamos el nuevo usuario en Supabase
+            }
+            
+            return ResponseEntity.ok(usuario);
+            
+        } catch (FirebaseAuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: " + e.getMessage());
         }
     }
    
