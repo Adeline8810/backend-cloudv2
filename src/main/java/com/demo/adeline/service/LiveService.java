@@ -13,17 +13,29 @@ public class LiveService {
     private LiveRepository liveRepository;
 
     public Live iniciarLive(Long usuarioId, String titulo) {
-        // Si ya tiene un live activo, lo cerramos o lo devolvemos (aquí lo devolvemos)
-        return liveRepository.findByUsuarioIdAndEstado(usuarioId, "EN_VIVO")
-                .orElseGet(() -> {
-                    Live nuevoLive = new Live();
-                    nuevoLive.setUsuarioId(usuarioId);
-                    nuevoLive.setTitulo(titulo);
-                    nuevoLive.setEstado("EN_VIVO");
-                    // Generamos una clave única para la transmisión
-                    nuevoLive.setStreamKey(UUID.randomUUID().toString());
-                    return liveRepository.save(nuevoLive);
-                });
+        // 1. Si ya tiene algo activo, lo marcamos como FINALIZADO primero para no duplicar
+        liveRepository.findByUsuarioIdAndEstado(usuarioId, "EN_VIVO")  
+            .ifPresent(live -> {
+                live.setEstado("FINALIZADO");
+                liveRepository.save(live);
+            });
+
+        // 2. Creamos el nuevo registro
+        Live nuevoLive = new Live();
+        nuevoLive.setUsuarioId(usuarioId);
+        nuevoLive.setTitulo(titulo);
+        nuevoLive.setEstado("EN_VIVO");
+        nuevoLive.setStreamKey(UUID.randomUUID().toString()); // Esto servirá de ID para PeerJS
+        
+        return liveRepository.save(nuevoLive);
+    }
+
+    public void finalizarLivePorUsuario(Long usuarioId) {
+        liveRepository.findByUsuarioIdAndEstado(usuarioId, "EN_VIVO")
+            .ifPresent(live -> {
+                live.setEstado("FINALIZADO");
+                liveRepository.save(live);
+            });
     }
 
     public void finalizarLive(Long liveId) {

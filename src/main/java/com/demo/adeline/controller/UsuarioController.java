@@ -265,6 +265,29 @@ public class UsuarioController {
         }
     }
    
-    
+    @PostMapping("/confirmar-pago")
+    public ResponseEntity<?> confirmarPago(@RequestBody Map<String, Object> datos) {
+        try {
+            String orderId = datos.get("orderID").toString();
+            Long userId = Long.parseLong(datos.get("usuarioId").toString());
+            int monedasRecarga = Integer.parseInt(datos.get("monedas").toString());
+
+            return repo.findById(userId).map(usuario -> {
+                int saldoActual = usuario.getMonedas();
+                usuario.setMonedas(saldoActual + monedasRecarga);
+                repo.save(usuario);
+                
+                // Devolvemos un OK con el mapa de éxito
+                return ResponseEntity.ok((Object) Map.of(
+                    "status", "success",
+                    "mensaje", "¡Pago procesado! Nuevo saldo: " + usuario.getMonedas(),
+                    "orderId", orderId
+                ));
+            }).orElseGet(() -> ResponseEntity.status(404).body((Object) "Usuario no encontrado"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al procesar el pago: " + e.getMessage());
+        }
+    }
     
 }
