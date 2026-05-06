@@ -13,7 +13,7 @@ public class LiveKitService {
     private String apiKey = "APIWwmmky7uVucE"; 
     
     // IMPORTANTE: Aquí debes pegar el código que aparece al darle a "Reveal secret"
-    private String apiSecret = "TU_SECRET_REVELADO_AQUI"; 
+    private String apiSecret = "MUdaEnibq2LbMAiGZuu5zEuZDY1DUbt4VCWJLn7aZKF"; 
 
     /**
      * Genera un token JWT compatible con LiveKit para acceder a la sala.
