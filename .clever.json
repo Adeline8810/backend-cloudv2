@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "app_id": "app_977e3ddd-a2b9-49c7-bfb5-7464172375f2",
+      "org_id": "user_85292d6b-db5c-4fb1-b50e-dbabfed32378",
+      "deploy_url": "https://github.com/Adeline8810/backend-cloudv1.git",
+      "git_ssh_url": "https://github.com/Adeline8810/backend-cloudv1.git",
+      "name": "backend-cloud0.1",
+      "alias": "backend-cloud01"
+    },
+    {
+      "app_id": "app_35b41b5e-4846-4b67-8702-c46d031300d8",
+      "org_id": "user_85292d6b-db5c-4fb1-b50e-dbabfed32378",
+      "deploy_url": "https://github.com/Adeline8810/backend-cloudv1.git",
+      "git_ssh_url": "https://github.com/Adeline8810/backend-cloudv1.git",
+      "name": "backend-cloudv2",
+      "alias": "backend-cloudv2"
+    }
+  ]
+}

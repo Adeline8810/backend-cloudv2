@@ -1,0 +1,87 @@
+package com.demo.adeline.controller;
+
+import com.demo.adeline.model.Usuario;
+import com.demo.adeline.repository.UsuarioRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "http://localhost:4200")
+public class UsuarioController {
+
+    private final UsuarioRepository repo;
+
+    public UsuarioController(UsuarioRepository repo) {
+        this.repo = repo;
+    }
+
+    //-----------------------------
+    // LISTAR TODOS
+    //-----------------------------
+    // Angular usa /listar, pero tú tenías GET /
+    @GetMapping("/listar")
+    public List<Usuario> listar() {
+        return repo.findAll();
+    }
+
+    //-----------------------------
+    // REGISTRAR (Angular espera /registrar)
+    //-----------------------------
+    @PostMapping("/registrar")
+    public Usuario registrar(@RequestBody Usuario u) {
+        return repo.save(u);
+    }
+
+    //-----------------------------
+    // LOGIN
+    //-----------------------------
+    @PostMapping("/login")
+    public Usuario login(@RequestBody Usuario u) {
+        Optional<Usuario> found = repo.findByUsernameAndPassword(
+                u.getUsername(),
+                u.getPassword()
+        );
+        return found.orElse(null);
+    }
+
+    //-----------------------------
+    // CRUD: OBTENER UNO
+    //-----------------------------
+    @GetMapping("/{id}")
+    public Usuario obtener(@PathVariable Long id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    //-----------------------------
+    // CRUD: CREAR USER (opcional)
+    //-----------------------------
+    @PostMapping("/")
+    public Usuario crear(@RequestBody Usuario u) {
+        return repo.save(u);
+    }
+
+    //-----------------------------
+    // CRUD: ACTUALIZAR
+    //-----------------------------
+    @PutMapping("/{id}")
+    public Usuario actualizar(@PathVariable Long id, @RequestBody Usuario u) {
+        return repo.findById(id).map(existing -> {
+            existing.setUsername(u.getUsername());
+          existing.setNombre(u.getNombre());
+            existing.setEmail(u.getEmail());
+            existing.setPassword(u.getPassword());
+            return repo.save(existing);
+        }).orElse(null);
+    }
+
+    //-----------------------------
+    // CRUD: ELIMINAR
+    //-----------------------------
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
+}
