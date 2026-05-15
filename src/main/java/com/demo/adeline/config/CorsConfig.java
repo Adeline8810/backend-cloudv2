@@ -14,6 +14,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                     .allowedOrigins(
+                    	"https://sparkling-t28w.onrender.com",
                         "https://adeline8810.github.io", 
                         "http://localhost:4200"
                     ) // Eliminamos la URL del propio backend (no se necesita a sí mismo)
