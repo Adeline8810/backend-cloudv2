@@ -15,6 +15,9 @@ public class Canto {
     private LocalDateTime fechaCreacion = LocalDateTime.now();
     @Column(name = "url_video") // La nueva columna
     private String urlVideo;
+    
+    private String estado;
+    
 
     private String tipo; // 'audio' o 'video'
     
@@ -53,6 +56,12 @@ public class Canto {
 	}
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
+	}
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 
     // Getters y Setters

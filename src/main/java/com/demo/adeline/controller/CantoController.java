@@ -61,13 +61,46 @@ public class CantoController {
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<Canto>> obtenerPorUsuario(@PathVariable Long usuarioId) {
-        return ResponseEntity.ok(cantoRepository.findByUsuarioId(usuarioId));
+        // Trae solo los cantos del usuario cuyo estado NO sea 'ELIMINADO'
+        return ResponseEntity.ok(cantoRepository.findByUsuarioIdAndEstadoNot(usuarioId, "ELIMINADO"));
     }
     
     @GetMapping("/todos")
     public ResponseEntity<List<Canto>> listarTodosLosCantos() {
-        // Busca todos los registros de la tabla 'cantos'
-        return ResponseEntity.ok(cantoRepository.findAll());
+        // Trae todos los cantos globales de la app que NO estén eliminados
+        return ResponseEntity.ok(cantoRepository.findByEstadoNot("ELIMINADO"));
     }
+    
+    
+ // ... Tus otros endpoints (subir, obtenerPorUsuario, etc.)
+
+    @PutMapping("/{id}/eliminar-logica")
+    public ResponseEntity<?> eliminarCantoLogica(@PathVariable Long id) {
+        try {
+            // 1. Buscar el canto por su ID usando tu repositorio
+            Canto canto = cantoRepository.findById(id).orElse(null);
+
+            if (canto == null) {
+                return ResponseEntity.status(404).body("No se encontró el cover con el ID: " + id);
+            }
+
+            // 2. Aplicar la eliminación lógica cambiando el estado
+            canto.setEstado("ELIMINADO");
+
+            // 3. Guardar el registro actualizado en Supabase
+            cantoRepository.save(canto);
+
+            // Devolvemos una respuesta exitosa con un mapa con el mensaje
+            return ResponseEntity.ok(Map.of(
+                "mensaje", "La cobertura ha sido marcada como eliminada correctamente",
+                "id", id
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al eliminar: " + e.getMessage());
+        }
+    }
+    
+    
     
 }
