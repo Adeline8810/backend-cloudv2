@@ -42,6 +42,7 @@ public class CantoController {
             Canto nuevoCanto = new Canto();
             nuevoCanto.setUsuarioId(usuarioId);
             nuevoCanto.setTipo(tipo); // 'audio' o 'video'
+            nuevoCanto.setEstado("ACTIVO");
 
             if ("video".equalsIgnoreCase(tipo)) {
                 nuevoCanto.setUrlVideo(urlFinal); // Va a la nueva columna
