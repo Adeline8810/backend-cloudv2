@@ -29,7 +29,6 @@ public class CantoController {
         @RequestParam(value = "tipo", defaultValue = "audio") String tipo) { 
         try {
             // 1. Configuración de Cloudinary
-            // Para video usamos "video" como resource_type. Cloudinary detecta si es mp4/webm/wav.
             Map options = ObjectUtils.asMap(
                 "resource_type", "video", 
                 "folder", "karaoke_covers"
@@ -41,14 +40,16 @@ public class CantoController {
             // 2. Guardar en la base de datos según el tipo
             Canto nuevoCanto = new Canto();
             nuevoCanto.setUsuarioId(usuarioId);
-            nuevoCanto.setTipo(tipo); // 'audio' o 'video'
+            nuevoCanto.setTipo(tipo); // 'audio' o 'video'    
+            
+            // ASIGNAR ESTADO ACTIVO POR DEFECTO
             nuevoCanto.setEstado("ACTIVO");
 
             if ("video".equalsIgnoreCase(tipo)) {
-                nuevoCanto.setUrlVideo(urlFinal); // Va a la nueva columna
+                nuevoCanto.setUrlVideo(urlFinal);
                 nuevoCanto.setUrlAudio(null); 
             } else {
-                nuevoCanto.setUrlAudio(urlFinal); // Lógica anterior
+                nuevoCanto.setUrlAudio(urlFinal);
                 nuevoCanto.setUrlVideo(null);
             }
 
