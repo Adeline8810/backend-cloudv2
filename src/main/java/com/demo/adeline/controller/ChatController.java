@@ -1,12 +1,19 @@
 package com.demo.adeline.controller;
 
+import java.util.List; // 🚨 NUEVO IMPORT
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;              // 🚨 NUEVO IMPORT
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired; // Para el @Autowired
-import com.demo.adeline.model.Mensaje; // Para la entidad Mensaje
-import com.demo.adeline.repository.MensajeRepository; // Para el repositorio
+import org.springframework.web.bind.annotation.GetMapping; // 🚨 NUEVO IMPORT
+import org.springframework.web.bind.annotation.PathVariable; // 🚨 NUEVO IMPORT
+import org.springframework.web.bind.annotation.ResponseBody; // 🚨 NUEVO IMPORT
+
+import com.demo.adeline.model.Mensaje;
+import com.demo.adeline.repository.MensajeRepository;
 
 @Controller
 public class ChatController {
@@ -30,4 +37,18 @@ public class ChatController {
 	    // 3. Lo devolvemos para que el socket lo muestre en tiempo real
 	    return mensajeData;
 	}
+	
+	
+	
+	
+	// --- 2. NUEVO MÉTODO PARA LA BANDEJA DE ENTRADA (HTTP GET) ---
+		@GetMapping("/api/chats/bandeja/{usuarioId}")
+		@ResponseBody // 🚀 Indica a Spring que devuelva un JSON directo a tu Angular
+		public ResponseEntity<List<Map<String, Object>>> obtenerBandejaEntrada(@PathVariable Long usuarioId) {
+		    // Llamamos al repositorio que creamos antes usando la Query avanzada
+		    List<Map<String, Object>> historialBandeja = mensajeRepo.findConversacionesRecientes(usuarioId);
+		    return ResponseEntity.ok(historialBandeja);
+		}
+	
+	
 }
