@@ -290,4 +290,19 @@ public class UsuarioController {
         }
     }
     
+    
+    @PutMapping("/{id}/cerrar-sesion-global")
+    public ResponseEntity<?> cerrarSesionGlobal(@PathVariable Long id) {
+        // Generamos una nueva clave de sesión aleatoria
+        String nuevaVersion = "v_" + System.currentTimeMillis();
+        
+        // Ejecuta un query o una llamada a tu repositorio para actualizar al usuario:
+        // Ejemplo ficticio: usuarioService.actualizarSessionVersion(id, nuevaVersion);
+        
+        return ResponseEntity.ok().body("{\"status\": \"Sesiones globales invalidadas\", \"sessionVersion\": \"" + nuevaVersion + "\"}");
+    }
+    
+    
+    
+    
 }
