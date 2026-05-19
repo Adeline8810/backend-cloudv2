@@ -22,6 +22,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-chat")
                 .setAllowedOriginPatterns(
+                	"https://sparkling-t28w.onrender.com",
                     "https://adeline8810.github.io", 
                     "http://localhost:4200"
                 ) // QUITAMOS EL "*" Y PONEMOS LOS DOMINIOS REALES
