@@ -35,6 +35,8 @@ public class LiveKitController {
             nuevoLive.setTitulo(payload.get("titulo").toString());
             if (payload.containsKey("thumbnailUrl")) {
                 nuevoLive.setThumbnailUrl(payload.get("thumbnailUrl").toString());
+                System.out.println("payload.get(\"thumbnailUrl\").toString()"+payload.get("thumbnailUrl").toString());
+                System.out.println("nuevoLive.getThumbnailUrl()"+nuevoLive.getThumbnailUrl());
             }
             // Generamos la sala automática
             String roomName = "sala_" + System.currentTimeMillis();
