@@ -33,7 +33,9 @@ public class LiveKitController {
             Live nuevoLive = new Live();
             nuevoLive.setUsuarioId(Long.valueOf(payload.get("usuarioId").toString()));
             nuevoLive.setTitulo(payload.get("titulo").toString());
-            
+            if (payload.containsKey("thumbnailUrl")) {
+                nuevoLive.setThumbnailUrl(payload.get("thumbnailUrl").toString());
+            }
             // Generamos la sala automática
             String roomName = "sala_" + System.currentTimeMillis();
             nuevoLive.setStreamKey(roomName);
