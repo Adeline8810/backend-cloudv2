@@ -29,6 +29,7 @@ public class CantoController {
         @RequestParam(value = "tipo", defaultValue = "audio") String tipo) { 
         try {
             // 1. Configuración de Cloudinary
+        	System.out.println("DEBUG: El tipo recibido es: " + tipo);
             Map options = ObjectUtils.asMap(
                 "resource_type", "video", 
                 "folder", "karaoke_covers"
@@ -44,15 +45,20 @@ public class CantoController {
             
             // ASIGNAR ESTADO ACTIVO POR DEFECTO
             nuevoCanto.setEstado("ACTIVO");
-
-            if ("video".equalsIgnoreCase(tipo)) {
+            
+         // AQUÍ ESTÁ LA LÓGICA QUE DEBE FUNCIONAR:
+            if ("video".equalsIgnoreCase(tipo.trim())) {
+                System.out.println("DEBUG: Guardando como VIDEO");
                 nuevoCanto.setUrlVideo(urlFinal);
                 nuevoCanto.setUrlAudio(null); 
             } else {
+                System.out.println("DEBUG: Guardando como AUDIO");
                 nuevoCanto.setUrlAudio(urlFinal);
                 nuevoCanto.setUrlVideo(null);
             }
-
+            
+            
+            
             cantoRepository.save(nuevoCanto);
             return ResponseEntity.ok(nuevoCanto);
 
@@ -106,7 +112,7 @@ public class CantoController {
     @GetMapping("/recientes")
     public List<Canto> getRecientes() {
         // Asegúrate de que este método exista en tu repositorio
-        return cantoRepository.findAllByOrderByFechaCreacionDesc();
+    	return cantoRepository.findByEstadoOrderByFechaCreacionDesc("ACTIVO");
     }
     
 }
