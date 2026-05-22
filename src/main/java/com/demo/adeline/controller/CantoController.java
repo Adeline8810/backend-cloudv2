@@ -103,6 +103,10 @@ public class CantoController {
         }
     }
     
-    
+    @GetMapping("/recientes")
+    public List<Canto> getRecientes() {
+        // Asegúrate de que este método exista en tu repositorio
+        return cantoRepository.findAllByOrderByFechaCreacionDesc();
+    }
     
 }

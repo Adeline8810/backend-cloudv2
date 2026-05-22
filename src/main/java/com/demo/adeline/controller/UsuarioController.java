@@ -274,6 +274,7 @@ public class UsuarioController {
 
             return repo.findById(userId).map(usuario -> {
                 int saldoActual = usuario.getMonedas();
+
                 usuario.setMonedas(saldoActual + monedasRecarga);
                 repo.save(usuario);
                 

@@ -25,5 +25,7 @@ public interface CantoRepository extends JpaRepository<Canto, Long> {
     // Opcional: Si quieres listar todos en la app pero ignorando los eliminados
     List<Canto> findByEstadoNot(String estado);
 	
+    List<Canto> findAllByOrderByFechaCreacionDesc();
+    
 	
 }

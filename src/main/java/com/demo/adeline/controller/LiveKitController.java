@@ -35,8 +35,7 @@ public class LiveKitController {
             nuevoLive.setTitulo(payload.get("titulo").toString());
             if (payload.containsKey("thumbnailUrl")) {
                 nuevoLive.setThumbnailUrl(payload.get("thumbnailUrl").toString());
-                System.out.println("payload.get(\"thumbnailUrl\").toString()"+payload.get("thumbnailUrl").toString());
-                System.out.println("nuevoLive.getThumbnailUrl()"+nuevoLive.getThumbnailUrl());
+                
             }
             // Generamos la sala automática
             String roomName = "sala_" + System.currentTimeMillis();
@@ -60,6 +59,7 @@ public class LiveKitController {
     @PostMapping("/finalizar/{id}")
     public ResponseEntity<?> finalizar(@PathVariable Long id) {
         return liveRepository.findById(id).map(live -> {
+       
             live.setEstado("FINALIZADO");
             liveRepository.save(live);
             return ResponseEntity.ok("Live finalizado");
