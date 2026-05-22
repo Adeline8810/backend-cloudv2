@@ -48,13 +48,11 @@ public class CantoController {
             
          // AQUÍ ESTÁ LA LÓGICA QUE DEBE FUNCIONAR:
             if ("video".equalsIgnoreCase(tipo.trim())) {
-                System.out.println("DEBUG: Guardando como VIDEO");
                 nuevoCanto.setUrlVideo(urlFinal);
-                nuevoCanto.setUrlAudio(null); 
+                nuevoCanto.setUrlAudio(""); // Usamos cadena vacía en vez de null
             } else {
-                System.out.println("DEBUG: Guardando como AUDIO");
                 nuevoCanto.setUrlAudio(urlFinal);
-                nuevoCanto.setUrlVideo(null);
+                nuevoCanto.setUrlVideo(""); // Usamos cadena vacía en vez de null
             }
             
             
