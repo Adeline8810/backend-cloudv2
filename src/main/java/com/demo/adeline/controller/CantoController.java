@@ -61,7 +61,12 @@ public class CantoController {
             return ResponseEntity.ok(nuevoCanto);
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al subir: " + e.getMessage());
+   
+          	e.printStackTrace(); 
+            
+            // 2. Esto te da una pista en la consola del navegador
+            return ResponseEntity.status(500).body("Error al subir: " + e.toString());
+       
         }
     }
 
