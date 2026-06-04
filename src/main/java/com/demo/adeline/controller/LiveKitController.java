@@ -40,13 +40,22 @@ public class LiveKitController {
             // Generamos la sala automática
             String roomName = "sala_" + System.currentTimeMillis();
             nuevoLive.setStreamKey(roomName);
-            nuevoLive.setEstado("EN_VIVO");
+            nuevoLive.setEstado("CREADO");
 
             liveRepository.save(nuevoLive);
             return ResponseEntity.ok(nuevoLive);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
+    }
+    
+    @PostMapping("/empezar/{id}")
+    public ResponseEntity<?> empezarLive(@PathVariable Long id) {
+        return liveRepository.findById(id).map(live -> {
+            live.setEstado("EN_VIVO");
+            liveRepository.save(live);
+            return ResponseEntity.ok(live);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     // LISTAR LIVES ACTIVOS (Usuario 2 - Círculos)
