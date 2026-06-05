@@ -42,6 +42,9 @@ public class RegaloController {
     
 
     private final Cloudinary cloudinary;
+    
+    @Autowired
+    private com.demo.adeline.repository.UsuarioRepository usuarioRepo;
 
 
     // Este es el constructor que estabas buscando:
@@ -65,14 +68,32 @@ this.cloudinary = cloudinary;
 
     // Registrar envío de regalo
     @PostMapping("/enviar")
-    public String enviarRegalo(@RequestBody RegaloRequest request) {
+    public ResponseEntity<?> enviarRegalo(@RequestBody RegaloRequest request) {
+        // 1. Buscar al regalador y al regalo para obtener el costo
+        var regalador = usuarioRepo.findById(request.getRegaladorId()).orElse(null);
+        var regalo = catalogoRepo.findById(request.getIdRegalo()).orElse(null);
+
+        if (regalador == null || regalo == null) {
+            return ResponseEntity.badRequest().body("Usuario o regalo no existe");
+        }
+
+        // 2. Validar si tiene suficientes monedas
+        if (regalador.getMonedas() < regalo.getValorMonedas()) {
+            return ResponseEntity.badRequest().body("Monedas insuficientes");
+        }
+
+        // 3. Descontar las monedas
+        regalador.setMonedas(regalador.getMonedas() - regalo.getValorMonedas());
+        usuarioRepo.save(regalador);
+
+        // 4. Guardar en el historial
         HistorialRegalo historial = new HistorialRegalo();
         historial.setIdRegalador(request.getRegaladorId());
         historial.setIdDestinatario(request.getDestinatarioId());
         historial.setIdRegalo(request.getIdRegalo());
-        
         historialRepo.save(historial);
-        return "OK";
+
+        return ResponseEntity.ok("OK");
     }
     
     

@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;                 // <--- Añade este para los errores de subida
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map; // Para el @RequestBody Map<String, String>
 import org.springframework.http.HttpStatus; // Para HttpStatus.UNAUTHORIZED
 import com.google.firebase.auth.FirebaseAuthException;
-import com.demo.adeline.config.JwtUtil;
+
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -66,25 +65,15 @@ public class UsuarioController {
         return ResponseEntity.created(URI.create("/api/usuarios/" + saved.getId())).body(saved);
     }
 
-    @Autowired
-    private JwtUtil jwtUtil;
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Usuario u) {
-        Optional<Usuario> found = repo.findByUsernameAndPassword(u.getUsername(), u.getPassword());
-        
-        if (found.isPresent()) {
-            Usuario user = found.get();
-            String token = jwtUtil.generarToken(user.getUsername(), user.getRol());
-            
-            // Creamos un mapa para devolver tanto el usuario como el token
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("usuario", user);
-            
-            return ResponseEntity.ok(response);
+    public ResponseEntity<Usuario> login(@RequestBody Usuario u) {
+        if (u.getUsername() == null || u.getPassword() == null) {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.status(401).build();
+
+        Optional<Usuario> found = repo.findByUsernameAndPassword(u.getUsername(), u.getPassword());
+        return found.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(401).build());
     }
 
     @GetMapping("/{id}")
