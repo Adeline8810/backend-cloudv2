@@ -41,6 +41,8 @@ public class Usuario {
     
     private String firebaseUid;
     
+    private String rol = "USER";
+    
     
 
     public Usuario() {}
@@ -163,6 +165,16 @@ public class Usuario {
 	public void setFirebaseUid(String firebaseUid) {
 		this.firebaseUid = firebaseUid;
 	}
+
+	public String getRol() {
+		return rol;
+	}
+
+	public void setRol(String rol) {
+		this.rol = rol;
+	}
     
+	
+	
 
 }
