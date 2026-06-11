@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,10 +62,9 @@ this.cloudinary = cloudinary;
     
     
 
-    // Obtener catálogo disponible
     @GetMapping("/lista")
     public List<CatalogoRegalos> listarRegalos() {
-        return catalogoRepo.findAll();
+        return catalogoRepo.findByActivoTrue();
     }
 
     // Registrar envío de regalo
@@ -101,7 +102,11 @@ this.cloudinary = cloudinary;
     @PostMapping("/upload-regalo")
     public ResponseEntity<String> uploadRegalo(@RequestParam("file") MultipartFile file, 
                                               @RequestParam("nombre") String nombre,
-                                              @RequestParam("costo") Integer costo) throws IOException {
+                                              @RequestParam("costo") Integer costo,
+                                              @RequestParam("tipo") String tipo,
+                                              @RequestParam("categoria") String categoria) throws IOException {
+    	
+    	 									
         
         // 1. Subir a Cloudinary
         var uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
@@ -116,12 +121,79 @@ this.cloudinary = cloudinary;
         nuevoRegalo.setNombre(nombre);
         nuevoRegalo.setValorMonedas(costo); // Mapeamos el costo al campo valorMonedas
         nuevoRegalo.setUrlImagen(urlCloudinary);
-        
+        nuevoRegalo.setTipo(tipo);
+        nuevoRegalo.setCategoria(categoria);
         // Asumimos que tienes un repositorio llamado catalogoRegalosRepository
         catalogoRepo.save(nuevoRegalo);
 
         return ResponseEntity.ok(urlCloudinary);
     }
     
+    
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<String> actualizarRegalo(
+            @PathVariable Long id,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("costo") Integer costo,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("categoria") String categoria
+    ) throws IOException {
+
+        return catalogoRepo.findById(id)
+                .map(regalo -> {
+
+                    try {
+
+                        regalo.setNombre(nombre);
+                        regalo.setValorMonedas(costo);
+                        regalo.setTipo(tipo);
+                        regalo.setCategoria(categoria);
+
+                        // Si enviaron nueva imagen
+                        if (file != null && !file.isEmpty()) {
+
+                            var uploadResult = cloudinary.uploader().upload(
+                                    file.getBytes(),
+                                    ObjectUtils.asMap(
+                                            "folder", "regalos",
+                                            "resource_type", "image"
+                                    )
+                            );
+
+                            String nuevaUrl =
+                                    uploadResult.get("secure_url").toString();
+
+                            regalo.setUrlImagen(nuevaUrl);
+                        }
+
+                        catalogoRepo.save(regalo);
+
+                        return ResponseEntity.ok("Regalo actualizado");
+
+                    } catch (Exception e) {
+                        return ResponseEntity.internalServerError()
+                                .body(e.getMessage());
+                    }
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @PutMapping("/eliminar-logico/{id}")
+    public ResponseEntity<String> eliminarLogico(@PathVariable Long id) {
+        // 1. Buscamos el regalo en la base de datos
+        return catalogoRepo.findById(id).map(regalo -> {
+            // 2. Cambiamos el estado (aquí asumimos que tu campo se llama 'activo')
+            regalo.setActivo(false); 
+            
+            // 3. Guardamos el cambio
+            catalogoRepo.save(regalo);
+            
+            return ResponseEntity.ok("Regalo eliminado lógicamente");
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    
+    
+
     
 }

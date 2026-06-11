@@ -12,4 +12,10 @@ public interface CatalogoRegalosRepository extends JpaRepository<CatalogoRegalos
     // Si necesitas buscar por tipo de regalo (ej: 'MONEDA' o 'GRATIS')
     // Spring Boot lo hará automático con esto:
     List<CatalogoRegalos> findByTipo(String tipo);
+    
+    
+    List<CatalogoRegalos> findByActivoTrue();
+    
+    
+    
 }

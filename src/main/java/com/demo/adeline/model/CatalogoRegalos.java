@@ -12,6 +12,9 @@ public class CatalogoRegalos {
     private String urlImagen;
     private Integer valorMonedas;
     private Integer valorEstrellas;
+    private String categoria;
+    @Column(name = "activo")
+    private boolean activo = true;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -26,6 +29,21 @@ public class CatalogoRegalos {
     public void setValorMonedas(Integer valorMonedas) { this.valorMonedas = valorMonedas; }
     public Integer getValorEstrellas() { return valorEstrellas; }
     public void setValorEstrellas(Integer valorEstrellas) { this.valorEstrellas = valorEstrellas; }
+	public String getCategoria() {
+		return categoria;
+	}
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
+	}
+	public boolean isActivo() {
+		return activo;
+	}
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+    
+	
+	
 }
     
     
