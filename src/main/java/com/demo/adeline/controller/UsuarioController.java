@@ -274,7 +274,15 @@ public class UsuarioController {
         return ResponseEntity.ok().body("{\"status\": \"Sesiones globales invalidadas\", \"sessionVersion\": \"" + nuevaVersion + "\"}");
     }
     
-    
+    @GetMapping("/por-username")
+    public ResponseEntity<Usuario> getByUsername(@RequestParam String username) {
+        return repo.findByUsername(username)
+                .map(user -> {
+                    user.setPassword(null);
+                    return ResponseEntity.ok(user);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
     
     
 }

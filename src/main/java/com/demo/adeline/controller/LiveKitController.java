@@ -19,7 +19,7 @@ public class LiveKitController {
     @Autowired
     private LiveRepository liveRepository;
 
-    // GENERAR TOKEN (Igual que antes)
+    // GENERAR TOKEN
     @GetMapping("/token")
     public Map<String, String> getToken(@RequestParam String room, @RequestParam String identity) {
         String token = liveKitService.createToken(room, identity);
