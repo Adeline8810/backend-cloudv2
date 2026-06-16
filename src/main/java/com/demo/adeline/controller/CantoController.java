@@ -10,63 +10,90 @@ import com.demo.adeline.repository.CantoRepository;
 
 import java.util.List;
 import java.util.Map;
-
+import com.demo.adeline.model.Cancion;
+import com.demo.adeline.repository.CancionRepository;
 
 @RestController
 @RequestMapping("/api/cantos")
+
 
 public class CantoController {
 
     @Autowired
     private Cloudinary cloudinary; // El que ya configuraste para tus fotos/videos
+    
+    
     @Autowired
     private CantoRepository cantoRepository;
-
+    
+    @Autowired
+    private CancionRepository cancionRepository;
+    
     @PostMapping("/subir")
     public ResponseEntity<?> subirCanto(
-        @RequestParam("archivo") MultipartFile archivo,
-        @RequestParam("usuarioId") Long usuarioId,
-        @RequestParam(value = "tipo", defaultValue = "audio") String tipo) { 
+            @RequestParam("archivo") MultipartFile archivo,
+            @RequestParam("usuarioId") Long usuarioId,
+            @RequestParam("cancionId") Long cancionId,
+            @RequestParam(value = "tipo", defaultValue = "audio") String tipo) {
+
         try {
-            // 1. Configuración de Cloudinary
-        	System.out.println("DEBUG: El tipo recibido es: " + tipo);
+
+            System.out.println("DEBUG tipo: " + tipo);
+            System.out.println("DEBUG cancionId: " + cancionId);
+
+            // Buscar canción original
+            Cancion cancionOriginal = cancionRepository
+                    .findById(cancionId)
+                    .orElse(null);
+
             Map options = ObjectUtils.asMap(
-                "resource_type", "video", 
-                "folder", "karaoke_covers"
+                    "resource_type", "video",
+                    "folder", "karaoke_covers"
             );
 
-            Map uploadResult = cloudinary.uploader().upload(archivo.getBytes(), options);
+            Map uploadResult = cloudinary.uploader().upload(
+                    archivo.getBytes(),
+                    options
+            );
+
             String urlFinal = uploadResult.get("secure_url").toString();
 
-            // 2. Guardar en la base de datos según el tipo
             Canto nuevoCanto = new Canto();
+
             nuevoCanto.setUsuarioId(usuarioId);
-            nuevoCanto.setTipo(tipo); // 'audio' o 'video'    
-            
-            // ASIGNAR ESTADO ACTIVO POR DEFECTO
+            nuevoCanto.setTipo(tipo);
             nuevoCanto.setEstado("ACTIVO");
-            
-         // AQUÍ ESTÁ LA LÓGICA QUE DEBE FUNCIONAR:
-            if ("video".equalsIgnoreCase(tipo.trim())) {
-                nuevoCanto.setUrlVideo(urlFinal);
-                nuevoCanto.setUrlAudio(""); // Usamos cadena vacía en vez de null
-            } else {
-                nuevoCanto.setUrlAudio(urlFinal);
-                nuevoCanto.setUrlVideo(""); // Usamos cadena vacía en vez de null
+
+            // Copiar datos de la canción original
+            if (cancionOriginal != null) {
+                nuevoCanto.setTitulo(cancionOriginal.getTitulo());
+                nuevoCanto.setArtista(cancionOriginal.getArtista());
+                nuevoCanto.setPortadaUrl(cancionOriginal.getPortadaUrl());
             }
-            
-            
-            
+
+            if ("video".equalsIgnoreCase(tipo.trim())) {
+
+                nuevoCanto.setUrlVideo(urlFinal);
+                nuevoCanto.setUrlAudio("");
+
+            } else {  
+
+                nuevoCanto.setUrlAudio(urlFinal);
+                nuevoCanto.setUrlVideo("");
+
+            }
+
             cantoRepository.save(nuevoCanto);
+
             return ResponseEntity.ok(nuevoCanto);
 
         } catch (Exception e) {
-   
-          	e.printStackTrace(); 
-            
-            // 2. Esto te da una pista en la consola del navegador
-            return ResponseEntity.status(500).body("Error al subir: " + e.toString());
-       
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body("Error al subir: " + e.getMessage());
         }
     }
 

@@ -28,32 +28,69 @@ public class CancionController {
     public ResponseEntity<?> subirCancion(
             @RequestParam("audio") MultipartFile file,
             @RequestParam("titulo") String titulo,
-            @RequestParam("artista") String artista, // <-- Agregado
-            @RequestParam("letra_json") String letraJson) {
+            @RequestParam("artista") String artista,
+            @RequestParam("letra_json") String letraJson,
+            @RequestParam(value = "portada", required = false) MultipartFile portada,
+            @RequestParam("usuarioId") Long usuarioId,
+            @RequestParam("username") String username,
+            @RequestParam(value = "usuarioFoto", required = false) String usuarioFoto) {
 
         try {
-            // 1. Subir a Cloudinary
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), 
-                ObjectUtils.asMap(
-                    "resource_type", "video",
-                    "folder", "slam_girls_audio"
-                ));
+
+            // ==========================
+            // SUBIR AUDIO A CLOUDINARY
+            // ==========================
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "resource_type", "video",
+                            "folder", "slam_girls_audio"
+                    ));
 
             String secureUrl = (String) uploadResult.get("secure_url");
 
-            // 2. Guardar en la DB
+            // ==========================
+            // SUBIR PORTADA SI EXISTE
+            // ==========================
+            String portadaUrl = null;
+
+            if (portada != null && !portada.isEmpty()) {
+
+                Map portadaUpload = cloudinary.uploader().upload(
+                        portada.getBytes(),
+                        ObjectUtils.asMap(
+                                "folder", "portadas_canciones"
+                        ));
+
+                portadaUrl = (String) portadaUpload.get("secure_url");
+            }
+
+            // ==========================
+            // GUARDAR EN BASE DE DATOS
+            // ==========================
             Cancion nuevaCancion = new Cancion();
+
             nuevaCancion.setTitulo(titulo);
-            nuevaCancion.setArtista(artista); // <-- Ahora usa el parámetro recibido
+            nuevaCancion.setArtista(artista);
             nuevaCancion.setUrlAudio(secureUrl);
             nuevaCancion.setLetraJson(letraJson);
+
+            // NUEVOS CAMPOS
+            nuevaCancion.setPortadaUrl(portadaUrl);
+            nuevaCancion.setUsuarioId(usuarioId);
+            nuevaCancion.setUsername(username);
+            nuevaCancion.setUsuarioFoto(usuarioFoto);
 
             cancionRepository.save(nuevaCancion);
 
             return ResponseEntity.ok(nuevaCancion);
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al procesar la canción: " + e.getMessage());
+
+            e.printStackTrace();
+
+            return ResponseEntity.status(500)
+                    .body("Error al procesar la canción: " + e.getMessage());
         }
     }
 

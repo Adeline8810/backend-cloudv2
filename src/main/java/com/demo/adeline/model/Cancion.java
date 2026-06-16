@@ -14,10 +14,20 @@ public class Cancion {
     private String titulo;
     private String artista;
     private String urlAudio; 
-
-    // IMPORTANTE: Especifica el nombre exacto de la columna de la DB
     @Column(name = "letra_json", columnDefinition = "TEXT") 
     private String letraJson;
+    
+    @Column(name = "portada_url")
+    private String portadaUrl;
+
+    @Column(name = "usuario_id")
+    private Long usuarioId;
+
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "usuario_foto")
+    private String usuarioFoto;
 
 	public Long getId() {
 		return id;
@@ -57,6 +67,38 @@ public class Cancion {
 
 	public void setLetraJson(String letraJson) {
 		this.letraJson = letraJson;
+	}
+
+	public String getPortadaUrl() {
+		return portadaUrl;
+	}
+
+	public void setPortadaUrl(String portadaUrl) {
+		this.portadaUrl = portadaUrl;
+	}
+
+	public Long getUsuarioId() {
+		return usuarioId;
+	}
+
+	public void setUsuarioId(Long usuarioId) {
+		this.usuarioId = usuarioId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUsuarioFoto() {
+		return usuarioFoto;
+	}
+
+	public void setUsuarioFoto(String usuarioFoto) {
+		this.usuarioFoto = usuarioFoto;
 	}
     
     
