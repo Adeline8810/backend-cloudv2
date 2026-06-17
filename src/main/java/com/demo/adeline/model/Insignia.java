@@ -15,6 +15,10 @@ public class Insignia {
 
     @Column(nullable = false, length = 50)
     private String nombre;
+    
+    @Column(nullable = false, length = 100)
+    private String nombrePresent;
+    
 
     @Column(name = "icono_url")
     private String iconoUrl;
@@ -35,4 +39,14 @@ public class Insignia {
     public void setIconoUrl(String iconoUrl) { this.iconoUrl = iconoUrl; }
     public Set<Usuario> getUsuarios() { return usuarios; }
     public void setUsuarios(Set<Usuario> usuarios) { this.usuarios = usuarios; }
+
+	public String getNombrePresent() {
+		return nombrePresent;
+	}
+
+	public void setNombrePresent(String nombrePresent) {
+		this.nombrePresent = nombrePresent;
+	}
+    
+    
 }

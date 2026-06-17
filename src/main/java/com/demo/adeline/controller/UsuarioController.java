@@ -19,15 +19,18 @@ import java.io.IOException;                 // <--- Añade este para los errores
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.demo.adeline.model.Mensaje;
 import com.demo.adeline.model.PerfilUsuarioDTO;
+import com.demo.adeline.repository.InsigniaRepository;
 import com.demo.adeline.repository.MensajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map; // Para el @RequestBody Map<String, String>
 import org.springframework.http.HttpStatus; // Para HttpStatus.UNAUTHORIZED
 import com.google.firebase.auth.FirebaseAuthException;
-
+import org.springframework.transaction.annotation.Transactional;
+import com.demo.adeline.model.Insignia;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,7 +41,8 @@ public class UsuarioController {
     private final Cloudinary cloudinary;
     private final MensajeRepository mensajeRepo;
     
-    
+    @Autowired
+    private InsigniaRepository insigniaRepo;
 
     public UsuarioController(UsuarioRepository repo,Cloudinary cloudinary, MensajeRepository mensajeRepo) {
         this.repo = repo;
@@ -285,4 +289,11 @@ public class UsuarioController {
     }
     
     
+    @Transactional(readOnly = true) // <--- ESTO EVITA EL ERROR DE LAZY LOADING
+    @GetMapping("/{id}/insignias")
+    public ResponseEntity<Set<Insignia>> obtenerInsigniasUsuario(@PathVariable Long id) {
+        return repo.findById(id).map(usuario -> 
+            ResponseEntity.ok(usuario.getInsignias())
+        ).orElse(ResponseEntity.notFound().build());
+    }
 }
