@@ -91,7 +91,7 @@ public class SalaConversacionController {
 
             sala.setNivel(1);
 
-            sala.setCantidadAsientos(4);
+            sala.setCantidadAsientos(9);
 
             sala.setPuntosSala(0L);
 
@@ -103,7 +103,7 @@ public class SalaConversacionController {
 
             salaRepository.save(sala);
             
-            for (int i = 1; i <= 8; i++) {
+            for (int i = 0; i <= 8; i++) {
                 SalaAsiento nuevoAsiento = new SalaAsiento();
                 nuevoAsiento.setSalaId(sala.getId());
                 nuevoAsiento.setNumeroAsiento(i);
@@ -291,23 +291,28 @@ public class SalaConversacionController {
     @PostMapping("/asientos/ocupar")
     public ResponseEntity<?> ocuparAsiento(@RequestBody Map<String, Object> payload) {
         try {
+            // Obtenemos los valores del payload
             Long salaId = Long.valueOf(payload.get("salaId").toString());
             Integer asientoNumero = Integer.valueOf(payload.get("asientoNumero").toString());
             Long usuarioId = Long.valueOf(payload.get("usuarioId").toString());
             String usuarioNombre = payload.get("usuarioNombre") != null ? payload.get("usuarioNombre").toString() : "Invitado";
-            
-            // Validación segura para la foto
             String fotoPerfil = (payload.get("fotoPerfil") != null) ? payload.get("fotoPerfil").toString() : "assets/img/default.png";
 
+            // LOG DE DEPURACIÓN CRÍTICO
+            System.out.println("DEBUG: Intentando ocupar salaId=" + salaId + " asientoNumero=" + asientoNumero);
+
+            // BUSQUEDA
             SalaAsiento asiento = asientoRepository.findBySalaIdAndNumeroAsiento(salaId, asientoNumero).orElse(null);
             
             if (asiento == null) {
-                return ResponseEntity.status(404).body("Asiento no encontrado");
+                // SI ENTRA AQUÍ, ES PORQUE NO EXISTE EL REGISTRO 0 EN LA TABLA PARA ESA SALA
+                System.err.println("ERROR: No se encontró el asiento " + asientoNumero + " para la sala " + salaId);
+                return ResponseEntity.status(404).body("Asiento " + asientoNumero + " no encontrado en la base de datos.");
             }
 
-            // Si ya está ocupado por otro usuario, bloqueamos
-            if (asiento.getOcupado() != null && asiento.getOcupado() && !usuarioId.equals(asiento.getUsuarioId())) {
-                return ResponseEntity.status(400).body("El asiento está ocupado");
+            // Si ya está ocupado por otro, bloqueamos
+            if (Boolean.TRUE.equals(asiento.getOcupado()) && !usuarioId.equals(asiento.getUsuarioId())) {
+                return ResponseEntity.status(400).body("El asiento está ocupado por otro usuario");
             }
 
             // Asignación de datos
@@ -319,7 +324,7 @@ public class SalaConversacionController {
 
             asientoRepository.save(asiento);
             
-            System.out.println("DEBUG - Asiento ocupado con éxito: " + asiento.getUsuarioNombre() + " Foto: " + fotoPerfil);
+            System.out.println("DEBUG - Asiento ocupado con éxito: " + asientoNumero + " por " + usuarioNombre);
 
             return ResponseEntity.ok(asiento);
             
