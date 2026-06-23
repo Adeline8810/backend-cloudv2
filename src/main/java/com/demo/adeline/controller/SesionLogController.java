@@ -80,12 +80,15 @@ public class SesionLogController {
         try {
             String urlGeo = "https://ipapi.co/" + ip + "/json/";
             Map<String, Object> response = restTemplate.getForObject(urlGeo, Map.class);
+            System.out.println("Respuesta ipapi: " + response);
             if (response != null && !response.containsKey("error")) {
                 log.setPais((String) response.getOrDefault("country_name", "France"));
-                log.setCiudad((String) response.getOrDefault("city", "Gerardmer"));
+                //log.setCiudad((String) response.getOrDefault("city", "Gerardmer"));
+                log.setCiudad((String) response.getOrDefault("city", "Inconnue"));
             } else {
                 log.setPais("France");
-                log.setCiudad("Gerardmer");
+               // log.setCiudad("Gerardmer");
+                log.setCiudad("Inconnue");
             }
         } catch (Exception e) {
             log.setPais("France");
